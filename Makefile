@@ -7,7 +7,7 @@
 # -DNDEBUG turns off assert() debugging in the code
 #
 # CFLAGS for a "release" built, no debugging and highly optimized.
-CFLAGS = -O3 -DNDEBUG
+# CFLAGS = -O3 -DNDEBUG
 #
 # uncomment this line to build a debug version.
 # need to type "make clean;make" to get the full effect
@@ -15,13 +15,13 @@ CFLAGS = -O3 -DNDEBUG
 #
 # or this one for a "light debug" version which works well with gdb
 # but is otherwise like the release version.
-# CFLAGS = -Wall -g -O1 -DNDEBUG
+CFLAGS = -Wall -g -O1 -DNDEBUG
 #
 # set of flags that produces the best speed on Angrim's
 # Athlon Thunderbird with gcc version egcs-2.91.66
 # CFLAGS = -O3 -march=i486 -DNDEBUG
 
-OBJECTS = aimoves.o bitboard.o board.o bughouse.o evaluate.o moves.o search.o capture_moves.o check_moves.o interface.o notation.o order_moves.o partner.o quiescense.o tests.o transposition.o validate.o
+OBJECTS = aimoves.o bitboard.o board.o book.o bughouse.o evaluate.o moves.o search.o capture_moves.o check_moves.o interface.o notation.o order_moves.o partner.o quiescense.o tests.o transposition.o validate.o
 
 # sunsetter is the default target, so either "make" or "make sunsetter" will do
 sunsetter: $(OBJECTS) Makefile
