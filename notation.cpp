@@ -21,7 +21,6 @@
 
 
 
-
 /*
  * Function: colorToChar
  * Input:    A color
@@ -30,14 +29,14 @@
  */
 
 char colorToChar(color c)
-   {
+{
    if (c == WHITE)
       return 'W';
    if (c == BLACK)
       return 'B';
    output("Bad color in colorToChar()\n");
    return ' ';
-   }
+}
 
 
 /*
@@ -48,7 +47,7 @@ char colorToChar(color c)
  */
 
 char pieceToChar(piece p)
-   {
+{
    switch(p)
       {
       case KNIGHT:
@@ -67,7 +66,7 @@ char pieceToChar(piece p)
          output("Bad piece in pieceToChar()\n");
          return ' ';
       }   
-   }
+}
 
 
 /*
@@ -78,7 +77,7 @@ char pieceToChar(piece p)
  */
 
 piece charToPiece(char ch)
-   {
+{
    switch(ch)
       {
       case 'N':
@@ -102,7 +101,7 @@ piece charToPiece(char ch)
       default:
          return NONE;
       }
-   }
+}
 
 
 /*
@@ -115,7 +114,7 @@ piece charToPiece(char ch)
  */
 
 void DBMoveToRawAlgebraicMove(move m, char *str)
-   {
+{
 
     str[0] = 0;
 
@@ -175,8 +174,8 @@ void DBMoveToRawAlgebraicMove(move m, char *str)
 
 #pragma warning ( default : 4244 )
 
-   }
-  
+}
+
 
 /*
  * Function: rawAlgebraicMoveToDBMove
@@ -188,7 +187,7 @@ void DBMoveToRawAlgebraicMove(move m, char *str)
  */
  
 move boardStruct::rawAlgebraicMoveToDBMove(const char *notation)
-   {
+{
    char ch;
    square from, to;
    piece promotion;
@@ -270,7 +269,7 @@ move boardStruct::rawAlgebraicMoveToDBMove(const char *notation)
    from = (notation[0] - 'a') * ONE_FILE + (notation[1] - '1') * ONE_RANK;
    to = (notation[2] - 'a') * ONE_FILE + (notation[3] - '1') * ONE_RANK;
    return move(from, to, position[from], promotion);
-   }
+}
 
 
 /*
@@ -283,7 +282,7 @@ move boardStruct::rawAlgebraicMoveToDBMove(const char *notation)
  */
 
 move boardStruct::algebraicMoveToDBMove(const char *notation)
-   {
+{
    char *ptr;
    move legalMoves[MAX_MOVES], m;
    piece p, promotion;
@@ -493,7 +492,7 @@ move boardStruct::algebraicMoveToDBMove(const char *notation)
       return m;
    m.makeBad();
    return m;
-   }
+}
 
 
 
@@ -501,7 +500,7 @@ move boardStruct::algebraicMoveToDBMove(const char *notation)
  * Function: printHtmlBoard
  * Input:    a file
  * Output:   None.
- * Purpose:  writes the part of a html file that shows the actual board position. 
+ * Purpose:  writes the part of a html file that shows the actual board position
  *           
  *           
  */
@@ -690,9 +689,7 @@ void printHtmlBoard (FILE *fi)
   fprintf(fi,"Eval <a href=\"start.html#eval\">(*)</a>: %s<br>\n", buf);
   AIBoard.setColorOnMove(AIBoard.getColorOffMove());
 
-
-
-
 }
 
-#endif
+#endif /* GAMETREE */
+
