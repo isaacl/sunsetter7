@@ -1,10 +1,11 @@
-/***********************************************************************************
- * Copyright 2002-2004 Ben Nye
- * book.cpp  simple opening book routine for Sunsetter
- * primary function:
- *    bookMove(move *rightMove, boardStruct &where)
- * returns a move which the book suggests playing on the passed in board.
- */
+/****************************************************************************
+ *     Copyright 2002-2004 Ben Nye                                          *
+ *  For license terms, see the file COPYING that came with this program.    *
+ *  book.cpp  simple opening book routine for Sunsetter                     *
+ *  primary function:                                                       *
+ *    bookMove(move *rightMove, boardStruct &where)                         *
+ *  returns a move which the book suggests playing on the passed in board.  *
+ ****************************************************************************/
 
 #include <string.h>
 #include <stdio.h>
@@ -35,9 +36,11 @@ bookMove{
 }
 */
 
-static int qstrcmp(const void *a,const void *b){
+static int
+qstrcmp(const void *a,const void *b){
 	return strcmp((const char *)a,(const char *)b);
 }
+
 // load book file into ram, parsing it and sorting it.
 static void
 initBook(void)
@@ -71,7 +74,7 @@ initBook(void)
 		}
 	}
 	// end the array with a string which should sort after all legal moves.
-	booklines[booklen]=(char *)malloc(5);
+	booklines[booklen]=(char *)malloc(6);
 	strcpy(booklines[booklen], "zzzzz");
 
 	// sort the array in lexical order
@@ -105,3 +108,4 @@ bookMove(move *rightMove, boardStruct &where)
 	}
 	return 0;
 }
+
