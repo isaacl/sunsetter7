@@ -48,7 +48,7 @@ return position[sq];
  * Function: showColor
  * Input: A square
  * Output: The Color on that square
- * Prurpose: To display the current position.
+ * Purpose: To display the current position.
  */
 
 int boardStruct::showColor(int sq)
@@ -60,6 +60,23 @@ int boardStruct::showColor(int sq)
 
 #endif
 
+char * boardStruct::getLineText()
+{
+	int n;
+	static char buf[MAX_STRING];
+	char tbuf[MAX_STRING];
+
+	// kludge, 16 is a magic number, means 16 ply.
+	if(moveNum>16) {strcpy(buf, "out of book");return buf;}
+	strcpy(buf, onMove==WHITE ? "W":"B");
+	for (n=1; n<moveNum; n++){
+		strcat(buf, " ");
+		DBMoveToRawAlgebraicMove(moveHistory[n], tbuf);
+		strcat(buf, tbuf);
+	}
+	return buf;
+}
+
 /* 
  * Function: addAttacks
  * Input:    A color a piece and a square
@@ -68,7 +85,7 @@ int boardStruct::showColor(int sq)
  */
 
 bitboard boardStruct::addAttacks(color c, piece p, square sq)
-   {
+{
    bitboard bb, bb2; 
 	
    if (p == PAWN) 
@@ -91,7 +108,7 @@ bitboard boardStruct::addAttacks(color c, piece p, square sq)
       }
 
    return bb2;
-   }
+}
 
 
 /* 
@@ -103,7 +120,7 @@ bitboard boardStruct::addAttacks(color c, piece p, square sq)
  */
 
 bitboard boardStruct::removeAttacks(color c, piece p, square sq)
-   {
+{
    bitboard bb,bb2;
    square sq2;
 
@@ -124,7 +141,7 @@ bitboard boardStruct::removeAttacks(color c, piece p, square sq)
       }
    
    return bb2;
-   }
+}
 
 
 /* 
@@ -136,7 +153,7 @@ bitboard boardStruct::removeAttacks(color c, piece p, square sq)
  */
 
 bitboard boardStruct::blockAttacks(color c, square where)
-   {
+{
    bitboard bb = (qword) 0;
    square sq;
 
@@ -161,7 +178,7 @@ bitboard boardStruct::blockAttacks(color c, square where)
  */
 
 bitboard boardStruct::uncoverAttacks(color c, square where)
-   {
+{
    bitboard bb;
    square sq;
 
@@ -174,7 +191,7 @@ bitboard boardStruct::uncoverAttacks(color c, square where)
       }
 
    return bb; 
-   }
+}
 
 
 /* 
@@ -186,7 +203,7 @@ bitboard boardStruct::uncoverAttacks(color c, square where)
  */
 
 void boardStruct::movePiece(color c, piece p, square from, square to, int hash, int attack)
-   {
+{
    if (attack)
    {
 		moveAttackedSomething[moveNum+1] = ~  (removePiece(c, p, from, hash, attack));
@@ -197,8 +214,7 @@ void boardStruct::movePiece(color c, piece p, square from, square to, int hash, 
 		removePiece(c, p, from, hash, attack);
 	    addPiece(c, p, to, hash, attack);
    }
-
-   }
+}
 
 
 /* 
@@ -212,7 +228,7 @@ void boardStruct::movePiece(color c, piece p, square from, square to, int hash, 
 
 bitboard boardStruct::replacePiece(color oldc, piece oldp, color newc, piece newp,
                       square sq, int hash, int attack)
-   {
+{
 	bitboard bb = (qword) 0;
    
    position[sq] = newp;
@@ -245,7 +261,7 @@ bitboard boardStruct::replacePiece(color oldc, piece oldp, color newc, piece new
       }
 
    return bb;
-   }
+}
 
 
 /* 
@@ -258,7 +274,7 @@ bitboard boardStruct::replacePiece(color oldc, piece oldp, color newc, piece new
  */
 
 bitboard boardStruct::removePiece(color c, piece p, square sq, int hash, int attack)
-   {
+{
 
 	bitboard bb = (qword) 0;
 
@@ -286,7 +302,7 @@ bitboard boardStruct::removePiece(color c, piece p, square sq, int hash, int att
       addToHash(c, p, sq);
 
    return bb;
-   }
+}
 
 
 /* 
@@ -300,7 +316,7 @@ bitboard boardStruct::removePiece(color c, piece p, square sq, int hash, int att
 */
 
 bitboard boardStruct::addPiece(color c, piece p, square sq, int hash, int attack)
-   {
+{
 
 	bitboard bb = (qword) 0;
 
@@ -326,7 +342,7 @@ bitboard boardStruct::addPiece(color c, piece p, square sq, int hash, int attack
    if (hash) addToHash(c, p, sq);
 
    return bb; 
-   }
+}
 
 
 /* 
@@ -338,14 +354,14 @@ bitboard boardStruct::addPiece(color c, piece p, square sq, int hash, int attack
  */
 
 void boardStruct::setCastleOptions(color c, int side, int can, int hash)
-   {
+{
    if ((hash) && (canCastle[c][side] != can))
       {
 		updateCastleHash(c, side);               /* Add the new hash value for
                                                         castling */ 
 	  }
    canCastle[c][side] = byte (can);
-   }
+}
 
 /* 
  * Function: getEval()
@@ -381,9 +397,9 @@ void boardStruct::getEval(char *buf)
  */
 
 color otherColor(color c)
-   {
+{
    return (color) (BLACK - c);
-   }
+}
 
 
 /* 
@@ -395,7 +411,7 @@ color otherColor(color c)
  */
 
 void boardStruct::addPieceToHand(color c, piece p, int hash)
-   {
+{
 
    hand[c][p]++;
    if (c == WHITE) 
@@ -405,7 +421,7 @@ void boardStruct::addPieceToHand(color c, piece p, int hash)
    if (hash) 
       addToInHandHash(c, p);
 
-   }
+}
 
 
 /* 
@@ -417,7 +433,7 @@ void boardStruct::addPieceToHand(color c, piece p, int hash)
  */
 
 void boardStruct::removePieceFromHand(color c, piece p, int hash)
-   {
+{
 
    hand[c][p]--;
    if (c == WHITE) 
@@ -427,7 +443,7 @@ void boardStruct::removePieceFromHand(color c, piece p, int hash)
    if (hash) 
       subtractFromInHandHash(c, p);
 
-   }
+}
 
 
 /* 
@@ -438,7 +454,7 @@ void boardStruct::removePieceFromHand(color c, piece p, int hash)
  */
 
 void boardStruct::setPieceInHand(color c, piece p, int num)
-   {
+{
    int n;
 
    for (n = 0; n < hand[c][p]; n++)
@@ -450,7 +466,7 @@ void boardStruct::setPieceInHand(color c, piece p, int num)
    else
       material -= (num - hand[BLACK][p]) * pValue[p];
    hand[c][p] = num;
-   }
+}
 
 
 /*
@@ -461,9 +477,9 @@ void boardStruct::setPieceInHand(color c, piece p, int num)
  */
 
 int rank(square sq)
-   {
-   return sq & 7;
-   }
+{
+	return sq & 7;
+}
 
 
 /*
@@ -474,9 +490,9 @@ int rank(square sq)
  */
 
 int file(square sq)
-   {
-   return (sq & 0x38) >> 3;
-   }
+{
+	return (sq & 0x38) >> 3;
+}
 
 
 /*
@@ -488,12 +504,12 @@ int file(square sq)
  */
 
 void boardStruct::setTime(color side, int time)
-   {
+{
    if (side == WHITE) 
       whiteTime = time;
    else
       blackTime = time;
-   }
+}
 
 
 /*
@@ -504,9 +520,9 @@ void boardStruct::setTime(color side, int time)
  */
 
 void boardStruct::setDeepBugColor(color c)
-   {
+{
    playing = c;
-   }
+}
 
 
 /*
@@ -517,13 +533,13 @@ void boardStruct::setDeepBugColor(color c)
  */
 
 void boardStruct::setColorOnMove(color c)
-   {
+{
    onMove = c;
   
    /* After changing the color to move there isn't any chance of en passant */
 
    enPassant = OFF_BOARD;
-   }
+}
 
 /*
  * Function: setCheckHistory
@@ -533,10 +549,9 @@ void boardStruct::setColorOnMove(color c)
  */
 
 void boardStruct::setCheckHistory(int check)
-   {
+{
 	checkHistory[moveNum] = check;
-
-   }
+}
 
 /*
  * Function: resetBoard
@@ -546,7 +561,7 @@ void boardStruct::setCheckHistory(int check)
  */
 
 void boardStruct::resetBoard()
-   {
+{
    int n;
  
    color c;
@@ -632,13 +647,13 @@ assert ((hashMoveCircle >= 0) && (hashMoveCircle <= 7));
 
 
    lastMoveTime = getSysMilliSecs(); 
-   }
+}
 
 void boardStruct::setLastMoveNow()
 
 {
-lastMoveTime = getSysMilliSecs(); 
-return;
+	lastMoveTime = getSysMilliSecs(); 
+	return;
 }
 
 /* 
@@ -649,10 +664,10 @@ return;
  */
 
 void boardStruct::copy(boardStruct *dest)
-   {
+{
    memcpy(dest, this, sizeof(boardStruct));
    return;
-   }
+}
 
 
 /*
@@ -663,7 +678,7 @@ void boardStruct::copy(boardStruct *dest)
  */
 
 int boardStruct::playMove(move m, int report)
-   {
+{
 
    int capturedPromotedPawn;
 
@@ -722,7 +737,7 @@ int boardStruct::playMove(move m, int report)
 assert ((hashMoveCircle >= 0) && (hashMoveCircle <= 7));
    
    return 0;
-   }
+}
 
 
 /*
@@ -735,7 +750,7 @@ assert ((hashMoveCircle >= 0) && (hashMoveCircle <= 7));
  */
 
 int boardStruct::unplayMove()
-   {
+{
    if (moveNum == 1 && onMove == WHITE)
       return -1;
       
@@ -747,14 +762,13 @@ int boardStruct::unplayMove()
    if (hashMoveCircle == -1) hashMoveCircle = 7; 
 
 assert ((hashMoveCircle >= 0) && (hashMoveCircle <= 7));
-   return 0;
-   }
+	return 0;
+}
 
 #ifdef GAMETREE
 
 move boardStruct::getMoveHistory (int ply)
 {
-
 	return moveHistory[gameBoard.getMoveNum()+ply];
 }
 
@@ -767,7 +781,7 @@ move boardStruct::getMoveHistory (int ply)
  */
 
 void boardStruct::makeNullMove()
-   {
+{
 		takeBackHistory[moveNum].oldep = enPassant;
 		enPassant = OFF_BOARD;
 
@@ -776,7 +790,7 @@ void boardStruct::makeNullMove()
 
 		moveAttackedSomething[moveNum] = qword (0); 
 
-   }
+}
 
 
 /*
@@ -786,14 +800,14 @@ void boardStruct::makeNullMove()
  */
 
 void boardStruct::unmakeNullMove()
-   {
+{
 		
 		moveNum--;
 
 		onMove = OFF_MOVE; 	
 	
 		enPassant = takeBackHistory[moveNum].oldep;
-   }
+}
 
 
 
@@ -805,10 +819,10 @@ void boardStruct::unmakeNullMove()
  */
 
 void boardStruct::playBughouse()
-   {
+{
    currentChangeBoard = &boardStruct::bugChangeBoard;
    currentUnchangeBoard = &boardStruct::bugUnchangeBoard;
-   }
+}
 
 
 /*
@@ -819,10 +833,10 @@ void boardStruct::playBughouse()
  */
 
 void boardStruct::playCrazyhouse()
-   {
+{
    currentChangeBoard = &boardStruct::ZHChangeBoard;
    currentUnchangeBoard = &boardStruct::ZHUnchangeBoard;
-   }
+}
 
 
 /*
@@ -837,9 +851,9 @@ void boardStruct::playCrazyhouse()
  */
 
 void boardStruct::changeBoard(move m)
-   {
-   (this->*currentChangeBoard)(m);
-   }
+{
+	(this->*currentChangeBoard)(m);
+}
 
 
 /*
@@ -853,9 +867,9 @@ void boardStruct::changeBoard(move m)
  */
 
 void boardStruct::unchangeBoard()
-   {
-   (this->*currentUnchangeBoard)();   
-   }
+{
+	(this->*currentUnchangeBoard)();   
+}
 
 
 /*
@@ -866,7 +880,7 @@ void boardStruct::unchangeBoard()
  */
 
 void boardStruct::bugChangeBoard(move m)
-   {
+{
 
    /* Save the information needed for when
       unchangeBoard() has to restore the position. 
@@ -1030,7 +1044,7 @@ void boardStruct::bugChangeBoard(move m)
    moveNum++;
   
    return;
-   }
+}
 
 
 /* 
@@ -1054,7 +1068,7 @@ void boardStruct::bugChangeBoard(move m)
  */
 
 void boardStruct::ZHChangeBoard(move m)
-   {   
+{   
 
    int capturedPromotedPawn;
 
@@ -1253,8 +1267,8 @@ void boardStruct::ZHChangeBoard(move m)
    moveNum++;
   
    
-   return;
-   }
+	return;
+}
 
 
 
@@ -1269,7 +1283,7 @@ void boardStruct::ZHChangeBoard(move m)
  */
 
 void boardStruct::bugUnchangeBoard()
-   {
+{
 
     moveNum--;
 	
@@ -1363,7 +1377,7 @@ void boardStruct::bugUnchangeBoard()
       }
 
    return;
-   }
+}
 
 
 /* 
@@ -1386,7 +1400,7 @@ void boardStruct::bugUnchangeBoard()
  */
 
 void boardStruct::ZHUnchangeBoard()
-   {  
+{  
 		    
     moveNum--;
 	
@@ -1503,7 +1517,7 @@ void boardStruct::ZHUnchangeBoard()
 
    
    return;
-   }
+}
 
 
 
@@ -1518,12 +1532,12 @@ void boardStruct::ZHUnchangeBoard()
  */
 
 int boardStruct::getTime(color c)
-   {
+{
    if (c == WHITE)
       return whiteTime;
    else
       return blackTime;
-   }
+}
 
 
 /*
@@ -1534,7 +1548,7 @@ int boardStruct::getTime(color c)
  */
 
 int boardStruct::outOfTime(color c)
-   {
+{
 
    double currentTime; 
    double usedTime;
@@ -1558,7 +1572,7 @@ int boardStruct::outOfTime(color c)
       return 1;
       }
    return 0;
-   }
+}
 
 
 /*
@@ -1570,21 +1584,17 @@ int boardStruct::outOfTime(color c)
  */
 
 int boardStruct::timeToMove()
-   {
-	
+{
+	double timeused;
+	double currentTime;
 
+	currentTime = getSysMilliSecs(); 
+	timeused = currentTime-lastMoveTime; 
 
-   double timeused;
-   double currentTime;
+	if ( timeused >= millisecondsPerMove)  return 1;   
 
-   currentTime = getSysMilliSecs(); 
-   timeused = currentTime-lastMoveTime; 
-
-   if ( timeused >= millisecondsPerMove)  return 1;   
-
-   return 0;
-
-   }
+	return 0;
+}
 
 
 /*
@@ -1595,9 +1605,9 @@ int boardStruct::timeToMove()
  */
 
 int boardStruct::getMoveNum()
-   {
-   return moveNum;
-   }
+{
+	return moveNum;
+}
 
 
 /*
@@ -1608,9 +1618,9 @@ int boardStruct::getMoveNum()
  */
 
 int boardStruct::getPieceInHand(color c, piece p)
-   {
-   return hand[c][p];
-   }
+{
+	return hand[c][p];
+}
 
 
 /*
@@ -1621,9 +1631,9 @@ int boardStruct::getPieceInHand(color c, piece p)
  */
 
 color boardStruct::getDeepBugColor()
-   {
+{
    return playing;
-   }
+}
 
 
 /*
@@ -1635,9 +1645,9 @@ color boardStruct::getDeepBugColor()
  */
 
 color boardStruct::getOpponentColor()
-   {
-   return otherColor(playing);
-   }
+{
+	return otherColor(playing);
+}
 
 
 /*
@@ -1648,9 +1658,9 @@ color boardStruct::getOpponentColor()
  */
 
 color boardStruct::getColorOnMove()
-   {
-   return onMove;
-   }
+{
+	return onMove;
+}
 
 
 /*
@@ -1661,9 +1671,9 @@ color boardStruct::getColorOnMove()
  */
 
 color boardStruct::getColorOffMove()
-   {
-   return OFF_MOVE;
-   }
+{
+	return OFF_MOVE;
+}
 
 
 /*
@@ -1674,9 +1684,9 @@ color boardStruct::getColorOffMove()
  */
 
 square boardStruct::getEnPassantSquare()
-   {
-   return enPassant;
-   }
+{
+	return enPassant;
+}
 
 
 /*
@@ -1687,9 +1697,9 @@ square boardStruct::getEnPassantSquare()
  */
 
 piece boardStruct::pieceOnSquare(square sq)
-   {
-   return position[sq];
-   }
+{
+	return position[sq];
+}
 
 
 #ifdef GAMETREE
@@ -1734,9 +1744,9 @@ int boardStruct::getMaterial()
  */
 
 qword boardStruct::getHashValue()
-   {
+{
    return hashValue;
-   }
+}
 
 /* Function: showDebugInfo
  * Input:    None
@@ -1746,7 +1756,7 @@ qword boardStruct::getHashValue()
  */
 
 void boardStruct::showDebugInfo()
-   {
+{
    int n, o;
    char rightSide[8][MAX_STRING], leftSide[MAX_STRING], buf[MAX_STRING];
 
@@ -1787,7 +1797,7 @@ void boardStruct::showDebugInfo()
       output(buf);
       }
    output("\n");
-   }
+}
 
 #endif
 
@@ -1805,7 +1815,7 @@ void boardStruct::showDebugInfo()
  */
 
 void boardStruct::stopIfBad()
-   {
+{
    square sq;
    bitboard w, b;
 
@@ -1844,7 +1854,7 @@ void boardStruct::stopIfBad()
    assert (!(w.hasBits() || b.hasBits()));
 
    return;
-   }
+}
   
 
 /*
@@ -1860,7 +1870,7 @@ void boardStruct::stopIfBad()
  */
 
 int boardStruct::badMove(move m)
-   {
+{
    bitboard bb;
 
    /* Drop moves are special, handle them now */
@@ -1948,5 +1958,6 @@ int boardStruct::badMove(move m)
             }
          }
       }
-   }
+}
 #endif
+
