@@ -129,7 +129,7 @@ extern qword BitInBB[SQUARES];
 struct move {
 
   private:
-  
+
   duword data;
 
   public:
@@ -156,7 +156,7 @@ struct move {
 /* A bitboard is a 64 bit piece of data, with 1 bit for every square */
 
 struct bitboard {
-  
+
   public:
   qword data;
    
@@ -170,7 +170,7 @@ struct bitboard {
   __forceinline void setBits(qword d) { data |= d; };
   __forceinline void setBits(bitboard b) { data |= b.data; };
   __forceinline void unsetBits(qword d) { data ^= d; }; 
-  
+
   // Note that this only works to unset already set bits 
   __forceinline void unsetBits(bitboard b) { data ^= b.data; };
 
@@ -187,11 +187,11 @@ struct bitboard {
   __forceinline bitboard operator =(bitboard b) { data = b.data; return *this; };
   __forceinline int operator ==(bitboard b) { return data == b.data; };
   __forceinline int operator !=(bitboard b) { return data != b.data; };  
-  
+
   __forceinline bitboard operator |(qword b) { return bitboard(data | b); };
   __forceinline bitboard operator |(bitboard b) { return bitboard(data | b.data); };
   __forceinline bitboard operator |=(bitboard b) { data |= b.data; return *this; };
-  
+
   __forceinline bitboard operator &(qword b) { return bitboard(data & b); };
   __forceinline bitboard operator &(bitboard b) { return bitboard(data & b.data); };
   __forceinline bitboard operator &=(bitboard b) { data &= b.data; return *this; };
@@ -205,7 +205,7 @@ struct bitboard {
      but on a 32 bit machine it doesn't have to bother with all the overhead of
      doing 64 bit shifts and is much quicker to user then the normal shift
      right.  It should be used when only the bottom 32 bits are needed */
-  
+
   __forceinline bitboard operator ~(void) { return bitboard(~data); };
 };
 
@@ -313,7 +313,7 @@ struct transpositionEntry {
   byte type : 4;			/* fail low, high, or exact */
   byte moveNr : 4;			/* to check whether an entry can be overwritten */
   byte depth;				/* How deep the position was searched */
-  
+
   sword value;              /* The value of the position */
   qword hash : 48;          /* The upper 48 bits of the hash value of the  position. */
 #ifdef DEBUG_HASH   
@@ -321,7 +321,7 @@ struct transpositionEntry {
 #endif
 
   move hashMove;            /* The best move last time */
-  
+
 };
 
 #ifdef _win32_
@@ -369,9 +369,9 @@ struct boardStruct {
   bitboard occupiedUL;           /* What squares are occupied, organized by
                                     diagonals going up and to the left */
   bitboard pieces[PIECES];       /* What squares are occupied by each piece */
-  
+
   square kingSquare[COLORS];     /* Where each king is */
-  
+
   sword attacks[COLORS][64];       /* How well each color attacks a square */
   int hand[COLORS][PIECES];      /* What is in the player's hands */
   int whiteTime;                 /* Time in 1/100th seconds on white's clock */
@@ -379,9 +379,9 @@ struct boardStruct {
   int timeTaken;                 /* Time in 1/100th seconds of how long the
 									player thought on the last move */
 
-  
-  
-  
+
+
+
   double lastMoveTime;		     /* When the last move was played */ 
   color playing;                 /* The color the computer in playing */
   color onMove;                  /* The color on the move */
@@ -395,7 +395,7 @@ struct boardStruct {
 									the moves played (hopefully no more than MAX_GAME_LENGTH)*/
   int checkHistory[MAX_GAME_LENGTH];
 								 /* whether we were in check on that move */
-  
+
   int bestCaptureGain[MAX_GAME_LENGTH];
 								 /* the best possible capture at that move,
 								    because of this we need to make sure 
@@ -403,7 +403,7 @@ struct boardStruct {
 									node */
 
   int moveNum;                   /* What half-move the position is on. */
-  
+
   qword hashValue;               /* The hash value for the position, used for
 									the transposition table. */
 #ifdef DEBUG_HASH
@@ -423,7 +423,7 @@ struct boardStruct {
   void ZHUnchangeBoard();
 
   /* Members used by eval() */  
-  
+
   int material;                 /* The relative material with positive 
 									 meaning white is up in material */
   int development;              /* The relative delelopment */
@@ -434,14 +434,14 @@ struct boardStruct {
 
   void addPieceToHand(color c, piece p, int hash);
   void removePieceFromHand(color c, piece p, int hash);
-  
+
   void setPieceInHand(color c, piece p, int num);
   void setTime(color side, int time);
   void setDeepBugColor(color c);
   void setColorOnMove(color c);
-  
+
   void setCheckHistory(int check); 
-  
+
   void copy(boardStruct *dest);        
 								/* Copies itself to another board,
 									the other board must already
@@ -474,19 +474,23 @@ struct boardStruct {
   void setLastMoveNow();		/* Used that when resaerching it doesn't think 
 									it has used up all time */
 
-  
+
   /* The primitives that get information from the board */
+
+	// rem returns static memory, don't free
+	char * getLineText();
 
   int getTime(color c);         /* Be carefull reading the time, it's 
 									only updated when winboard tells 
 									Sunsetter the time, so it's rarely right */
+
   int outOfTime(color c);
   int timeToMove();             /* TRUE if Sunsetter should stop thinking
 									and move now */
 
   int getMoveNum();
   int getPieceInHand(color c, piece p);
-  
+
   color getDeepBugColor();
   color getOpponentColor();
   color getColorOnMove();
@@ -507,7 +511,7 @@ struct boardStruct {
 
   int isLegal(move m);                /* returns TRUE if the move is legal,
 									 FALSE if not */
-  
+
   int isInCheck(color side);         /* returns 1 if side is in check,
 									 2 if side is in double check */
 
@@ -519,12 +523,12 @@ struct boardStruct {
 
   int aiMoves(move *m);               /* AIMoves() fills an array of 
 									with moves in the position */
-  
+
   int captureMoves(move *m);          /* captureMoves fills an array of 
 									moves with the captures in a 
 									position. */
   int captureGain(color c, move m);			/* How much material a move gains */
-  
+
   move *orderCaptures(move *m);				/* Orders captures based on material gain*/
 
   void captureMovesTo(move *m, square sq);	/* Fills an array of moves with
@@ -551,25 +555,25 @@ struct boardStruct {
 
   int standpatCondition();				
 
- 
-  #ifdef GAMETREE  // needed when outputing a game tree in html 
-  
-  piece showPiece (square sq); 
-  int showColor (square sq);
-  
-  int getDevelopment();   	
-  int getControl();
-  int getMaterial(); 
 
-  int getPieceDevOnSquare(color c, square sq, piece p); 
-  int oneSquareBoardControl(square sq, int report); 
-  
-  
+  #ifdef GAMETREE  // needed when outputing a game tree in html 
+
+  piece showPiece (square sq);
+  int showColor (square sq);
+
+  int getDevelopment();
+  int getControl();
+  int getMaterial();
+
+  int getPieceDevOnSquare(color c, square sq, piece p);
+  int oneSquareBoardControl(square sq, int report);
+
+
   move getMoveHistory(int ply); 
 
   #endif
 
-									  
+
   void getEval(char *buf);           /* outputs The current evaluation
 										split into components 
 										in the prinicpal variation */
@@ -594,14 +598,14 @@ struct boardStruct {
 												transposition tables */
 
   int checkLearnTable(); 
-  void saveLearnTable(int pointsWon); 
-  
+  void saveLearnTable(int pointsWon);
+
   private:
 
   /* Primitives called internally */
 
   /* These update the hash value of the board */
-  
+
   void initHash();
   void addToHash(color c, piece p, square sq);
 
@@ -616,9 +620,9 @@ struct boardStruct {
   int swap(square from, square to);
 
   /* functions to move pieces */
-  
+
   void movePiece(color c, piece p, square to, square from, int hash, int attack);
-  
+
   bitboard replacePiece(color oldc, piece oldp, color newc,
           piece newp, square sq, int hash, int attack);
   bitboard removePiece(color c, piece p, square sq, int hash, int attack);
@@ -641,7 +645,7 @@ struct boardStruct {
   bitboard rankAttacks(square sq);
   bitboard diagULAttacks(square sq);
   bitboard diagURAttacks(square sq);
-  
+
   bitboard addAttacks(color c, piece p, square sq);
   bitboard removeAttacks(color c, piece p, square sq);
   bitboard blockAttacks(color c, square sq);
@@ -784,7 +788,6 @@ extern const int knightDirection[8];
 	#define FIRST_RANK  (0x0101010101010101ULL)
 
 #endif
-
 
 
 #endif
