@@ -1,0 +1,12 @@
+# file format for sunsetter's book.
+# lines starting with a '#' are comments
+; so are lines starting with a semicolon
+# lines starting with a 'W' are to be played as white
+# lines starting with a 'B' are to be played as black
+; Important note: the same book is currently used for both
+; bughouse and crazyhouse/w23 so be careful of lines that are only
+; playable in one of them.
+# as of this writing(July 9,04) the book lines are limited to 9 moves.
+W e2e4 e7e6 d2d4; sample white line
+B e2e4 e7e6# sample black line
+B e2e3 e7e5 #
