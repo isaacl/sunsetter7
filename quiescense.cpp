@@ -60,7 +60,7 @@ extern move searchMoves[DEPTH_LIMIT][MAX_MOVES];
 int quiesce(int alpha, int beta, int ply)
 {
    int best, value;
-   move *end, *current, *m, anyMove;   
+   move *end, *current, *m;   
 
 assert (ply <= DEPTH_LIMIT); 
 
