@@ -1,6 +1,6 @@
 /* ***************************************************************************
  *                                Sunsetter                                  *
- *				 (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
+ *               (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
  *   For license terms, see the file COPYING that came with this program.    *
  *                                                                           *
  *  Name: quienscense.cc                                                     *
@@ -24,7 +24,6 @@
 #include <string.h>
 #include "notation.h"
 #endif
-
 
 
 
@@ -59,7 +58,7 @@ extern move searchMoves[DEPTH_LIMIT][MAX_MOVES];
  */
 
 int quiesce(int alpha, int beta, int ply)
-   {
+{
    int best, value;
    move *end, *current, *m, anyMove;   
 
@@ -159,7 +158,7 @@ assert (ply <= DEPTH_LIMIT);
    end = AIBoard.orderCaptures(m);
 
    for (current = m; current < end; current++)
-      {
+   {
 
 	   if (best >= beta) break;
 
@@ -177,7 +176,7 @@ assert (value <= INFINITY);
 
 #ifdef GAMETREE
 			char buf[MAX_STRING], buf2[MAX_STRING], buf3[MAX_STRING];  
-		
+
 			if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
 			{								
 				DBMoveToRawAlgebraicMove(*current, buf);
@@ -185,25 +184,24 @@ assert (value <= INFINITY);
 				sprintf (buf3,"<a href=\"%s-%d.html\">%s</a>  Return Value: %d<br>\n",buf2,currentDepth, buf,value); 				
 				fprintf (fi[ply], buf3); 
 			}
-#endif		
+#endif
 
 		if (value > best) 
 		{
 			best = value;
 		}
-   
-		}
-		
+	}
+
 
    
 #ifdef GAMETREE
 	if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
 	{
 		fprintf(fi[ply],"<br><br><hr><br>Return: end of quiesce<br></td></tr></table></html>\n");
-		fclose(fi[ply]); 
+		fclose(fi[ply]);
 	}
-#endif    
+#endif
 
-   return best;
-   }
+	return best;
+}
 
