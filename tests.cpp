@@ -182,10 +182,10 @@ for(;;)    // go through the whole game
 	
     if(!strcmp(buf, "OVER") || (gameBoard.isCheckmate())) {
           sprintf(buf,"\n\n");output(buf); 
-          sprintf(buf," Searches overall: %d\n", stats_overallsearches);output(buf);
-		  sprintf(buf,"QSearches overall: %d\n", stats_overallqsearches);output(buf);
-		  sprintf(buf,"ClockTicks       : %d\n", stats_overallticks);output(buf);
-		  sprintf(buf,"mNPS             : %d\n\n", (stats_overallsearches+stats_overallqsearches) / (stats_overallticks +1)); output(buf);
+          sprintf(buf," Searches overall: %ld\n", stats_overallsearches);output(buf);
+		  sprintf(buf,"QSearches overall: %ld\n", stats_overallqsearches);output(buf);
+		  sprintf(buf,"ClockTicks       : %ld\n", stats_overallticks);output(buf);
+		  sprintf(buf,"mNPS             : %ld\n\n", (stats_overallsearches+stats_overallqsearches) / (stats_overallticks +1)); output(buf);
 
 #ifdef DEBUG_STATS		  
 		  sprintf(buf,"Debug A: %d\n", stats_overallDebugA);output(buf);
