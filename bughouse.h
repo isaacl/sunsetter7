@@ -1,6 +1,6 @@
 /* ***************************************************************************
  *                                Sunsetter                                  *
- *				 (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
+ *               (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
  *   For license terms, see the file COPYING that came with this program.    *
  *                                                                           *
  *  Name: bughouse.h                                                         *
@@ -16,7 +16,7 @@
 #ifndef _BUGHOUSE_
 #define _BUGHOUSE_
 
-#define VERSION "7e"
+#define VERSION "7f"
 
 enum rules { BUGHOUSE, CRAZYHOUSE };
 
@@ -27,7 +27,7 @@ extern int forceMode;		/* forceMode is 1 when Sunsetter isn't playing moves of i
 
 extern int sitting;         /* If Sunsetter is sitting */
 
-extern int toldpartisit;	/* If we decidet to sit on our own */
+extern int toldpartisit;	/* If we decided to sit on our own */
 extern int toldparttosit;
 extern int parttoldgo;
 extern int partsitting;      /* If it told partner to sit  */
@@ -39,32 +39,31 @@ extern long stats_overallticks;
 
 
 #ifdef DEBUG_STATS
-  extern long  stats_overallDebugA; 
-  extern long  stats_overallDebugB; 
+  extern long  stats_overallDebugA;
+  extern long  stats_overallDebugB;
 #endif
 
 #ifdef DEBUG_HASH
-  extern int debug_allcoll; 
-#endif
-  
-#ifdef GAMETREE
-	extern long tree_positionsSaved; 
+  extern int debug_allcoll;
 #endif
 
+#ifdef GAMETREE
+	extern long tree_positionsSaved;
+#endif
 
 
 extern int evaluation;
-extern int firstBigValue; 
+extern int firstBigValue;
 
 
 extern int gameInProgress;  /* If a game is going on */
 
 extern int soughtGame;      /* Have we already sought crazyhouse games */
 
-void ReadIniFile(char *filename); 
+void ReadIniFile(char *filename);
 
 void initialize();
-void setDefaultValues(); 
+void setDefaultValues();
 int makeTranspositionTable(unsigned int size);
 
 int testbpgn(int argc, char **argv);
