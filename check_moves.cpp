@@ -1,6 +1,6 @@
 /* ***************************************************************************
  *                                Sunsetter                                  *
- *				 (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
+ *               (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
  *   For license terms, see the file COPYING that came with this program.    *
  *                                                                           *
  *  Name: check_moves.cc                                                     *
@@ -27,13 +27,13 @@ inline extern void fillMoveArray(move **m, square from, piece p,bitboard dest);
 
 
 int boardStruct::checkEvasionCaptures(move *m)
-   {
-   bitboard to, possibleTo, checks, thePieces;
-   square sq, checkSquare;
-   move *original;
-bitboard bb;
+{
+	bitboard possibleTo, checks, thePieces;
+	square sq, checkSquare;
+	move *original;
+	bitboard bb;
 
-   original = m;
+	original = m;
 
 
 
@@ -118,7 +118,7 @@ bitboard bb;
   
    m->makeBad();
    return m - original;
-   }
+}
 
 /* 
  * Function: checkEvasionOthers
@@ -132,7 +132,7 @@ bitboard bb;
 
 
 int boardStruct::checkEvasionOthers(move *m)
-   {
+{
    bitboard to, possibleTo, checks, thePieces;
    square sq, checkSquare;
    move *original;
@@ -236,4 +236,5 @@ int boardStruct::checkEvasionOthers(move *m)
 
    m->makeBad();
    return m - original;
-   }
+}
+
