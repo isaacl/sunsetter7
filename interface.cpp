@@ -281,7 +281,8 @@ int checkInput()
 
 // This function attempts to do a non-blocking read from stdin, and
 // if a whole line is read then it returns this line in the memory
-// pointed to by str.  str should point to at least MAX_STRING bytes
+// pointed to by str and returns 1, otherwise *str is not changed and
+// it returns 0.  str should point to at least MAX_STRING bytes
 // of memory. --Angrim
 
 int Input(char *str)
@@ -496,7 +497,7 @@ void reportResult(result res)
  */
 
 void parseHolding(const char *str)
-   {
+{
    int i, hand[COLORS][PIECES];
    color c;
    piece p;
@@ -541,7 +542,7 @@ void parseHolding(const char *str)
    for (c = WHITE; c <= BLACK; c = (color) (c + 1))
       for(p = PAWN; p <= QUEEN; p = (piece) (p + 1))
          gameBoard.setPieceInHand(c, p, hand[c][p]);
-   }
+}
 
 
 /*
@@ -552,7 +553,7 @@ void parseHolding(const char *str)
  */
 
 void parseOption(const char *str)
-   {
+{
    int n; 
    move m;
    char tmp[MAX_STRING], buf[MAX_STRING], arg[MAX_ARG][MAX_STRING];
@@ -984,7 +985,7 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
       if ((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor()) 
             && !forceMode && !analyzeMode)
 			output("It is not your move");
-	     
+
 	  if (gameBoard.playMove(m,0)) 
          {
          sprintf(buf, "Tried to play illegal move: %s\n", str);
@@ -993,10 +994,10 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
       else 
          {
          stopThought(); /* Interrupt the pondering */
-		 if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());         		 
-         }
-      }
-   }
+			if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
+		}
+	}
+}
 
 
 /*
@@ -1008,15 +1009,15 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
  */
 
 void pollForInput()
-   {
-   static int i;
+{
+	static int i;
 
-   if (i++ > 20000)
-      {
-      checkInput();
-      i = 0;
-      }
-   }
+	if (i++ > 20000)
+	{
+		checkInput();
+		i = 0;
+	}
+}
 
 
 /*
@@ -1027,22 +1028,22 @@ void pollForInput()
  */
 
 void giveMove(move m)
-   {
-   char str[MAX_STRING], buf[MAX_STRING];
+{
+	char str[MAX_STRING], buf[MAX_STRING];
 
-   DBMoveToRawAlgebraicMove(m, str);
-   if (str[0] == 0)
-      {
-      sprintf(buf, "Illegal move: %02X to %02X in giveMove()\n", 
-                m.from(), m.to());
-      output(buf);
-      return;
-      }
+	DBMoveToRawAlgebraicMove(m, str);
+	if (str[0] == '\0')
+	{
+		sprintf(buf, "Illegal move: %02X to %02X in giveMove()\n",
+			m.from(), m.to());
+		output(buf);
+		return;
+	}
 
-      sprintf(buf, "move %s\n\0", str);
-      output(buf);
+	sprintf(buf, "move %s\n", str);
+	output(buf);
 
-   }
+}
 
 /*
  * Function: getSysMilliSecs
@@ -1053,12 +1054,11 @@ void giveMove(move m)
 
 long getSysMilliSecs()
 {
-double tmp; 
+	double tmp; 
 
-tmp=clock();
-tmp*=1000; 
-return long((tmp / CLOCKS_PER_SEC)) ; 
-
+	tmp=clock();
+	tmp*=1000; 
+	return long((tmp / CLOCKS_PER_SEC)) ; 
 }
 
 
