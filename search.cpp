@@ -135,7 +135,7 @@ void printPrincipalVar(int valueReached)
   timeUsed = (endClockply-startClockply); 
   if (((timeUsed / 10) < 2) && !analyzeMode) return; 
 
-  sprintf (buf2,""); 
+  strcpy (buf2,""); 
 
   for(n = 0; n < pv.depth[0]; n++) 
   {
@@ -259,7 +259,10 @@ void analyzeUpdate()
 		if (!searchMoves[0][movesSearched].isBad())		
 		{
 			DBMoveToRawAlgebraicMove(searchMoves[0][movesSearched],buf2);
-			sprintf (buf, "             %5d %8d  searching: %s ..   ( HT: %2d percent )\r",((getSysMilliSecs()-startClockply) /10), stats_positionsSearched , buf2, (stats_hashFillingUp * 100 / stats_hashSize)); 
+			sprintf (buf,
+				"             %5ld %8d  searching: %s ..   ( HT: %2d percent )\r",
+				((getSysMilliSecs()-startClockply) /10), stats_positionsSearched ,
+				buf2, (stats_hashFillingUp * 100 / stats_hashSize)); 
 			output (buf); 
 		}
 		startClockAnalyze = getSysMilliSecs(); 
@@ -546,11 +549,11 @@ assert (!AIBoard.badMove(m));
 void searchRoot(int depth, move *rightMove, int *bestValue )
 {
     
-  int n, done;				/* needed for sorting moves */
+  int n, done;              /* needed for sorting moves */
   int bestValueEver, count, startDepth, searchedFirstMove;
   int value = -INFINITY; 
 
-  move hashMove, tmp, bestMoveLastPly;
+  move tmp, bestMoveLastPly;
   int values[MAX_MOVES];
   
   char buf[MAX_STRING];
@@ -659,7 +662,7 @@ assert (n <= count); // this checks that the hash move we
 
   if ((currentRules == CRAZYHOUSE) && (*bestValue <= -EXTREME_EVAL) && (currentDepth > 5))
 
-  {	  
+  {
 	  millisecondsPerMove *= 2; 
   }
 
@@ -672,7 +675,7 @@ assert (n <= count); // this checks that the hash move we
 
   
   if(!searchedFirstMove) 
-  {	
+  {
 	  
 	  value = searchFirstMove(searchMoves[0][0], FractionalDeep[currentDepth], *bestValue);
 
@@ -687,7 +690,7 @@ assert (n <= count); // this checks that the hash move we
     
   } 
   else 
-  {			
+  {
 	   searchedFirstMove = 0;
   } 
 	 
@@ -720,7 +723,7 @@ assert (n <= count); // this checks that the hash move we
 
   while(movesSearched < (count-1)) 
   
-  {	
+  {
 	  movesSearched++;
 	  
 	  
