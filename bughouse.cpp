@@ -61,6 +61,9 @@ void sleep (int);
 #include <unistd.h>
 #endif
 
+/* bookMove() should have its own header file, minor todo */
+extern int bookMove(move *rightMove, boardStruct &where);
+
 int sitting;
 int toldpartisit;
 int toldparttosit;
@@ -69,7 +72,7 @@ int partsitting;
 int psittinglong; 
 
 
-char	personalityIni[10][512]; 
+char personalityIni[10][512];
 
 int		PERSONALITY = 0; 
 int		FIXED_DEPTH; 
@@ -188,22 +191,22 @@ FILE *findFile(const char *name, const char *mode)
 
 /* Function: findZHGame
  * Input:    None
- * Output:   Nane
+ * Output:   None
  * Purpose:  Used when we're playing crazyhouse.  It seeks for a game and waits
  *           for it to start
  */
 
-void findZHGame()
+static void
+findZHGame()
 {
-  if(!soughtGame) {
-    soughtGame = 1;
+	if(!soughtGame) {
+		soughtGame = 1;
 
-	output("tellics gameend1\n");
-	output("tellics gameend2\n");
-    output("tellics gameend3\n");
-    output("tellics gameend4\n");
-
-  }
+		output("tellics gameend1\n");
+		output("tellics gameend2\n");
+		output("tellics gameend3\n");
+		output("tellics gameend4\n");
+	}
 }
 
 /* Function: main
@@ -213,104 +216,91 @@ void findZHGame()
  *           then it runs the game loop.
  */
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
+	move m;
+	int n, o;
+	char buf[MAX_STRING];
 
-
-
-  move m;
-  int n, o;
-  char buf[MAX_STRING];
-
-  if(argc > 1 && !strcmp(argv[1], "test")) 
-  
-  {
-    /* If the first argument that Sunsetter is given is 
-	  "test" then go through a bpgn file  */
-    initialize();
-	testbpgn(argc, argv);	
-	return 0; 
-  }
-
-  if(argc > 1 && !strcmp(argv[1], "speedtest")) 
-  
-  {    
-	/* If the first argument that Sunsetter is 
-	  given is "speedtest" then use the bpgn file to test 
-	  make/unmake eval and movegen speed on all positions
-	  in that bpgn game */
-    initialize();
-	speedtest(argc, argv);	
-	return 0; 
-  }
-
-
-  initialize();
-
-  /* parse the options */
-
-  for(n = 1; n < argc; n++) {
-    if(argv[n][0] == '-') {
-      strcpy(buf, argv[n] + 1);
-      for(o = n + 1; o < argc && argv[o][0] != '-'; o++) {
-        strcat(buf, " ");
-        strcat(buf, argv[o]);
-      }
-      parseOption(buf);
-    }
-  }
-
-  for (;;) {
-
-    /* If we don't have a partner, lets try to get one, but only if not playing crazyhouse */
-
-	  if(xboardMode && !gameInProgress && !partner && !analyzeMode)  { findZHGame();} 
-
-
-    if (gameInProgress && !forceMode) 
+	if(argc > 1 && !strcmp(argv[1], "test")) 
 	{
-		
-		if((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor())) 
+		/* If the first argument that Sunsetter is given is 
+		 "test" then go through a bpgn file  */
+		initialize();
+		testbpgn(argc, argv);	
+		return 0; 
+	}
+
+	if(argc > 1 && !strcmp(argv[1], "speedtest")) 
+	{    
+	/* If the first argument that Sunsetter is 
+		given is "speedtest" then use the bpgn file to test 
+		make/unmake eval and movegen speed on all positions
+		in that bpgn game */
+		initialize();
+		speedtest(argc, argv);
+		return 0;
+	}
+
+
+	initialize();
+
+	/* parse the options */
+
+	for(n = 1; n < argc; n++) {
+		if(argv[n][0] == '-') {
+			strcpy(buf, argv[n] + 1);
+			for(o = n + 1; o < argc && argv[o][0] != '-'; o++) {
+				strcat(buf, " ");
+				strcat(buf, argv[o]);
+			}
+			parseOption(buf);
+		}
+	}
+
+	for (;;) {
+
+		if(xboardMode && !gameInProgress && !partner && !analyzeMode) {
+			/* nothing going on, trigger the gameend scripts */
+			findZHGame();
+		}
+
+		if (gameInProgress && !forceMode) 
 		{
-		
+			if((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor())) 
+			{
+				if( (gameBoard.getMoveNum()>9) || !bookMove(&m, gameBoard)) findMove(&m);
+				if(!m.isBad() && gameInProgress && !forceMode && !analyzeMode)
+				gameBoard.playMove(m, 1);
+			}
+			else if (currentRules == BUGHOUSE)
+			{
+				// no pondering in Bug at all  
 
+				millisecondsPerMove = 10000;
+				if (gameBoard.timeToMove() && (!toldparttosit) && (!partsitting)) {
+					toldparttosit =1;
+					output ("tellics ptell sit (my opponent is waiting for something)\n");
+				}
+				millisecondsPerMove = 100000000;
+			}		
+			else if (gameBoard.getMoveNum() != 1 && tryToPonder && !analyzeMode) 
+			{
+				ponder();
+			} 
+		}
 
-		findMove(&m);
-		if(!m.isBad() && gameInProgress && !forceMode && !analyzeMode)
-		gameBoard.playMove(m, 1);
-
-		} 
-	
-		// not pondering in Bug at all  
-		//
-		
-		else if (currentRules == BUGHOUSE) 
-		{
-
-			millisecondsPerMove = 10000;
-			if (gameBoard.timeToMove() && (!toldparttosit) && (!partsitting)) {toldparttosit =1; output ("tellics ptell sit (my opponent is waiting for something)\n"); }
-			millisecondsPerMove = 100000000;
-		}		
-		
-		else if (gameBoard.getMoveNum() != 1 && tryToPonder && !analyzeMode) 
-		{
-
-		ponder();
-		} 
-	
-
-    }
+		// sleep for 1/100th of a second, avoid hogging the cpu
 #ifdef _win32_
-	sleep(10);
+		sleep(10);
 #endif
-
 #ifndef _win32_
-	usleep(10000);
+		usleep(10000);
 #endif
 
-checkInput();
+		checkInput();
   }
-
 }
 
 /* Function: ReadIniFile
@@ -321,10 +311,10 @@ checkInput();
  */
 
 
- void ReadIniFile(char *filename) 
-  {
-   char parambuf[MAX_STRING]; 
-   FILE *inif;	
+void ReadIniFile(char *filename) 
+{
+	char parambuf[MAX_STRING]; 
+	FILE *inif;	
 
   inif = findFile(filename, "rt");
   if(inif) {	  
@@ -333,8 +323,8 @@ checkInput();
       fgets(parambuf, MAX_STRING, inif);
       parseOption(parambuf);
     }
-  }
- }
+	}
+}
 
 
 /* Function: initialize
@@ -345,7 +335,6 @@ checkInput();
 
 void initialize()
 {
-
 	char fileName[MAX_STRING];
 
 #ifdef LOG
@@ -374,16 +363,15 @@ void initialize()
 
 
 
-  if(makeTranspositionTable(MIN_HASH_SIZE)) 
-  {
-	fprintf(stderr, "Not enough memory!\n");
-	exit(1);
-  }
+	if(makeTranspositionTable(MIN_HASH_SIZE)) 
+	{
+		fprintf(stderr, "Not enough memory!\n");
+		exit(1);
+	}
   
-    /* Try to find the initialization file. If it's found then send all of the
-     strings to parseOption() */
+	/* Try to find the initialization file. If it's found then send all of the
+	   strings to parseOption() */
     
-  sprintf (fileName,"ss-%s.ini",VERSION); 
-  ReadIniFile(fileName);
-
+	sprintf (fileName,"ss-%s.ini",VERSION); 
+	ReadIniFile(fileName);
 }
