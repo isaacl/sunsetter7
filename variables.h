@@ -1,6 +1,6 @@
 /* ***************************************************************************
  *                                Sunsetter                                  *
- *				 (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
+ *               (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
  *   For license terms, see the file COPYING that came with this program.    *
  *                                                                           *
  *  Name: variables.h                                                        *
@@ -46,11 +46,11 @@
 
 // #define DEBUG_XBOARD 
 
-/* define this to turn learning info ON
+/* define this to turn learning info ON */
 
 // #define DEBUG_LEARN 
 
-/* define this to turn extra statistics ON  
+/* define this to turn extra statistics ON */
 	
 // #define DEBUG_STATS
 
@@ -59,6 +59,5 @@
 // #define GAMETREE 500
 
 
-
-
 #endif
+
