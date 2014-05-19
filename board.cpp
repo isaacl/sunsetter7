@@ -691,8 +691,8 @@ int boardStruct::playMove(move m, int report)
    if (currentRules == BUGHOUSE)
       { 
 				/* Do stuff to keep track of promotions.  
-                This is done is changeBoard() in crazyhouse
-                but for bug it's not so importantt for the
+                This is done in changeBoard() in crazyhouse
+                but for bug it's not so important for the
                 search, so time isn't taken up in
                 changeBoard() and it's done here. */
 
@@ -1875,8 +1875,8 @@ int boardStruct::badMove(move m)
 
    /* Drop moves are special, handle them now */
 
-   if (m.from() == IN_HAND) 
-      {
+	if (m.from() == IN_HAND) 
+	{
       if (hand[onMove][m.moved()] == 0) 
          return 1;
       if (position[m.to()] != NONE) 
@@ -1884,11 +1884,10 @@ int boardStruct::badMove(move m)
       if (m.moved() == PAWN && (rank(m.to()) == 0 || rank(m.to()) == 7)) 
          return 1;
       return 0;
-      }
+	}
 
-   /* moving a piece from a square that it isn't on is a no-no */
-   if (m.moved() != position[m.from()]) 
-      return 1;
+	/* moving a piece from a square that it isn't on is a no-no */
+	if (m.moved() != position[m.from()]) return 1;
 
    /* Capturing one of your own piece is a no-no */
    if (occupied[onMove].squareIsSet(m.to())) 

@@ -16,7 +16,7 @@
 #ifndef _BUGHOUSE_
 #define _BUGHOUSE_
 
-#define VERSION "7f"
+#define VERSION "7g"
 
 enum rules { BUGHOUSE, CRAZYHOUSE };
 

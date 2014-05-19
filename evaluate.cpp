@@ -283,8 +283,13 @@ return min(12, mInHand );
  * Purpose:  used in search for razoring
  */
 
+// note name is entirely wrong, as is the above description.
+// seems to test whether the recently moved piece now attacks something
+// that was not attacked before, or attacks that something more times
+// than it has defenders.
 int boardStruct::highestAttacked(square moveTo)
 {
+	square sq;
 	
 	if (takeBackHistory[moveNum-1].captured != NONE) return 1;
 	// captured something
@@ -293,15 +298,11 @@ int boardStruct::highestAttacked(square moveTo)
 		|| ((position[moveTo] == QUEEN) && (attacks[onMove][moveTo]) )) return 0;
 	// piece is probably en prise there 
 	
-
-	square sq;
-	
 	bitboard bb = ( moveAttackedSomething[moveNum] & occupied[onMove] );
 	while (bb.hasBits())
 	{
 		sq = firstSquare(bb.data);
 		bb.unsetSquare(sq); 
-
 
 		if ((!attacks[onMove][sq]) 
 			&& (attacks[OFF_MOVE][sq] == 1) 
@@ -311,8 +312,7 @@ int boardStruct::highestAttacked(square moveTo)
 
 		if ((pValue[position[sq]] > pValue[position[moveTo]] + bestCaptureGain[moveNum-1] + 20))
 			return 1;
-
-		// we just attacked a piece more than it was defendet
+		// we just attacked a piece more than it was defended
 
 	}
 

@@ -28,7 +28,7 @@ extern FILE *logFile;
 
 /* clientLogin is what the user sees when loging in.  */
 
-extern char *clientLogin;
+extern const char *clientLogin;
 
 
 #include "board.h"

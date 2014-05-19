@@ -24,7 +24,7 @@
    from and a bitboard with the destination squares set it fills a move
    array and increments the pointer to that array */
 
-inline extern void fillMoveArray(move **m, square from, piece p,bitboard dest);
+extern void fillMoveArray(move **m, square from, piece p,bitboard dest);
 
 /* 
  * Function: whitePawnCapturesTo
@@ -269,7 +269,8 @@ int boardStruct::captureGain(color c, move m)
 	  }
       else break;
 
-      gain[count++] = gain[count - 1] + sign * attackedValue;
+      gain[count] = gain[count - 1] + sign * attackedValue;
+	  count++;
       attackedValue = pValue[position[from]];
       attacks.unsetSquare(from);
       sign *= -1;

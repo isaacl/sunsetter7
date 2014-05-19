@@ -31,6 +31,7 @@
 	#include <sys/time.h>
 	#include <sys/types.h>
 	#include <unistd.h>
+	#include <sys/select.h>
 
 #endif
 
@@ -49,7 +50,7 @@
 
 /* This is what is echoed when the user first logs on to Sunsetter in client mode.  */
 
-char *clientLogin = 
+const char *clientLogin = 
 "\n\n"
 "            ^^                   @@@@@@@@@\n"
 "       ^^       ^^            @@@@@@@@@@@@@@@\n"
@@ -61,8 +62,7 @@ char *clientLogin =
 "   ~  ~~     ~         ~      ~~~~~~  ~~ ~~~       ~~ ~ ~~  ~~ ~\n"
 "\n"
 " Sunsetter " VERSION " \n"
-" (c) Ben Dean-Kawamura, Georg v. Zimmermann\n"
-" See http://www.d2d4.de/sunsetter.asp for more info.\n\n";
+" (c) Ben Dean-Kawamura, Georg v. Zimmermann\n\n";
 
 int ratingDiff = 0; 
 int learning = 0;
@@ -329,12 +329,11 @@ int Input(char *str)
 
 void waitForInput()
 {
-  struct timeval tv;
-  fd_set stdin_holder;
-  FD_ZERO(&stdin_holder); FD_SET(0, &stdin_holder);
-  tv.tv_sec = 3600*24*10; tv.tv_usec = 0;
-	// wait for up to 10 days for input.
-	select(1, &stdin_holder, NULL, NULL, &tv);
+	fd_set stdin_holder;
+
+	FD_ZERO(&stdin_holder); FD_SET(0, &stdin_holder);
+	// wait for input.
+	select(1, &stdin_holder, NULL, NULL, NULL);
 	/* not guaranteed to have stdin available now since I didn't
 	 * check the return value, but really likely */
 }
@@ -352,12 +351,11 @@ void waitForInput()
 
 int checkInput()
 {
-   int fd, wasInput;
+   int wasInput;
    char str[MAX_STRING];
 
 
    wasInput = 0;
-   fd = 0;
                      
    if(gameBoard.timeToMove()) stopThought();
 

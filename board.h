@@ -138,7 +138,7 @@ struct move {
                     (mp << 16) | (p << 19); };
   __forceinline move(square f, square t, piece mp) { data = f | (t << 8) | 
 					(mp << 16); };
-  __forceinline move()                    {};
+  __forceinline move()                    {data=0; makeBad();};
 
   __forceinline int operator ==(move m)   { return data == m.data; };
   __forceinline int operator !=(move m)   { return data != m.data; };

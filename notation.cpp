@@ -124,8 +124,6 @@ void DBMoveToRawAlgebraicMove(move m, char *str)
       {
       assert (m.to() < SQUARES);
 
-#pragma warning ( disable : 4244 )
-      
 	  str[0] = pieceToChar(m.moved());
       str[1] = '@';
       str[2] = 'a' + file(m.to());
@@ -162,18 +160,12 @@ void DBMoveToRawAlgebraicMove(move m, char *str)
                assert (0); 
             }      
          }
-      else
-         str[4] = 0;
-      return;
-      }
-   else
-      {
-	   assert (0); 
-      
-   }
-
-#pragma warning ( default : 4244 )
-
+		else
+			str[4] = '\0';
+		return;
+	} else {
+		assert (0); 
+	}
 }
 
 
@@ -283,52 +275,55 @@ move boardStruct::rawAlgebraicMoveToDBMove(const char *notation)
 
 move boardStruct::algebraicMoveToDBMove(const char *notation)
 {
-   char *ptr;
-   move legalMoves[MAX_MOVES], m;
-   piece p, promotion;
-   int toFile, toRank, fromFile, fromRank, moveCount, toSquare, i, matchedOne;
+	const char *ptr;
+	move legalMoves[MAX_MOVES], m;
+	piece p, promotion;
+	int toFile, toRank, fromFile, fromRank, moveCount, toSquare, i, matchedOne;
 
-   /* First try to see if it's in raw algebraic notation (g1f3) */
+	/* First try to see if it's in raw algebraic notation (g1f3) */
 
-   m = rawAlgebraicMoveToDBMove(notation);
-   if (!m.isBad())
-      return m;
+	m = rawAlgebraicMoveToDBMove(notation);
+	if (!m.isBad())
+		return m;
 
-   moveCount = moves(legalMoves);
+	moveCount = moves(legalMoves);
 
-   /* The format is [B,K,N,P,R,Q][a-h][1-8][X]<a-h>[1-8][extra] 
-      this function parses the string from the right to the left.
-      The first thing it does is skip over the extra at the end (the +s and #s)
-     */
+	/* The format is [B,K,N,P,R,Q][a-h][1-8][X]<a-h>[1-8][extra] 
+	  this function parses the string from the right to the left.
+	  The first thing it does is skip over the extra at the end (the +s and #s)
+	 */
   
-   ptr = strchr(notation, '\0') - 1;
-   while (*ptr == '+' || *ptr == '#')
-      if (--ptr == notation)
-         {
-         m.makeBad();
-         return m;
-         }
+	if(strlen(notation)<2){
+		m.makeBad();
+		return m;
+	}
 
-   /* See if the move is a promotion */
+	ptr = notation+strlen(notation) - 1; // start at the end
+	while (*ptr == '+' || *ptr == '#') if (--ptr == notation)
+	{
+		m.makeBad();
+		return m;
+	}
 
-   if (*(ptr - 1) == '=')
-      {
-      promotion = charToPiece(*ptr);
-      if (promotion == NONE)
-         {
-         m.makeBad();
-         return m;
-         }
-      ptr -= 2;
-      }
-   else
-      promotion = NONE;
+	/* See if the move is a promotion */
+
+	if (*(ptr - 1) == '=')
+	{
+		promotion = charToPiece(*ptr);
+		if (promotion == NONE)
+		{
+			m.makeBad();
+			return m;
+		}
+		ptr -= 2;
+	} else
+		promotion = NONE;
 
    /* Now we're on the to square, parse the rank (if there is one)
       then the file */
 
    if (isdigit(*ptr))
-      {
+   {
       if (*ptr == '0' || *ptr == '9')
          {
          m.makeBad();
@@ -336,19 +331,17 @@ move boardStruct::algebraicMoveToDBMove(const char *notation)
          }
       toRank = *(ptr--) - '1';
       p = NONE;
-      }
-   else
-      {
+	} else {
       toRank = -1;      /* -1 is the magic number that tells us the rank
                          wasn't specified */
       p = PAWN;
-      }
-   if (*ptr < 'a' || *ptr > 'h')
-      {
-      m.makeBad();
-      return m;
-      }
-   toFile = tolower(*ptr) - 'a';
+	}
+	if (*ptr < 'a' || *ptr > 'h')
+	{
+		m.makeBad();
+		return m;
+	}
+	toFile = tolower(*ptr) - 'a';
   
 
   /* If this is the begining of the string the move was a pawn move

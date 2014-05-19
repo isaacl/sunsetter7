@@ -198,19 +198,20 @@ for(;;)    // go through the whole game
 
 	
 	output (buf);
-    output (" ");
+	output (" ");
 
-    gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
-                   // make sure Sunsetter always thinks it is playing the color to move next
+	gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
+	// make sure Sunsetter always thinks it is playing the color to move next
 
-    if ((skipmoves == 0) || (skipmoves == (((gameBoard.getMoveNum()-1) /2)+1)) && (gameBoard.getColorOnMove() == skipcolor) ) 
-                   // search all moves or only the one given as 4th argument
+	if ((skipmoves == 0) || ((skipmoves == (((gameBoard.getMoveNum()-1) /2)+1)) && (gameBoard.getColorOnMove() == skipcolor)) ) 
+	// search all moves or only the one given as 4th argument
 
-    {
-	zapHashValues(); 
-	output ("\n\n"); 
-    findMove(&m);           // do the search. Currently Sunsetter takes as much time as if it would
-                            // have InitialTime left.
+	{
+		zapHashValues(); 
+		output ("\n\n"); 
+		findMove(&m);      // do the search.
+	//	Currently Sunsetter takes as much time as if it
+	//  would have InitialTime left.
 
 
 

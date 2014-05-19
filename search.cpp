@@ -1,6 +1,6 @@
 /* ***************************************************************************
  *                                Sunsetter                                  *
- *				 (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
+ *               (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
  *   For license terms, see the file COPYING that came with this program.    *
  *                                                                           *
  *  Name: search.cc                                                          *
@@ -15,13 +15,13 @@
  * move that causes search() to be the highest.                              *
  *                                                                           *
  * search() uses an Negamax search with alpha-beta pruning, NullMove Pruning *
- * plus other search extensions to find its evaluation of the position.   *
- *																			 *			
+ * plus other search extensions to find its evaluation of the position.      *
+ *                                                                           *
  * Because the Branching Factor in Crazyhouse and Bughouse is so big, and    *
  * deep mates so common we use a 4-steps PMG ( Plausible Move Generator )    *
  * compared to most chess programs which only do 2 steps, normal search and  *
- * quiesce search.															 *
- *																			 *
+ * quiesce search.                                                           *
+ *                                                                           *
  *************************************************************************** */
 
 
@@ -36,8 +36,8 @@
 #include "interface.h"
 
 
-PrincipalVariation pv;					/* The principal variation, there needs
-                                         to be a seperate one for each ply that
+PrincipalVariation pv;                /* The principal variation, there needs
+                                         to be a separate one for each ply that
                                          is searched */
 
 move searchMoves[DEPTH_LIMIT][MAX_MOVES]; /* Where to store the moves.  They
@@ -849,87 +849,81 @@ if ((*bestValue <= -EXTREME_EVAL) && (! bestMoveLastPly.isBad()) && (!analyzeMod
 
 void ponder()
 {
+	move m[MAX_MOVES], tmp;
+
+	int values[MAX_MOVES],  n, count, value, done;
+	int extensions = 0;
+	char buf[MAX_STRING], buf2[MAX_STRING];
+
+	pondering = 1;
+	gameBoard.copy(&AIBoard);
+	AIBoard.setCheckHistory(0);
+
+
+	stopThinking = 0;
+	currentDepth = 1;
+	millisecondsPerMove = 100000000;
+	count = AIBoard.moves(m);
+	memset(values, 0, sizeof(values));
+
 
   
-  move m[MAX_MOVES], tmp;
+	while(!stopThinking && currentDepth < MAX_SEARCH_DEPTH)
+	{
+		if (currentDepth > 5)   
+		{
+			DBMoveToRawAlgebraicMove(m[0],buf2);
+			sprintf(buf, "pondering %s %6d [%2d-%2d]\n", buf2, values[0],
+				currentDepth, currentDepth+(extensions/ONE_PLY));
+			output(buf);
+		}
 
-  int values[MAX_MOVES],  n, count, value, done;
-  int extensions = 0;
-  char buf[MAX_STRING], buf2[MAX_STRING];
+		extensions = 0; 
 
-  pondering = 1;
+		for(n = 0; n < count; n++) 
+		{
 
-  gameBoard.copy(&AIBoard);
-  AIBoard.setCheckHistory(0);
+			if (n && (currentDepth > 3) && (values[n-1] > values[n]+80))
+				extensions -= ONE_PLY;
+		  
+			AIBoard.changeBoard(m[n]);
 
+			values[n] = -search(-INFINITY, +INFINITY,
+				FractionalDeep[currentDepth - 1] + extensions, 1, 1);
 
-  stopThinking = 0;
-  currentDepth = 1;
-  millisecondsPerMove = 100000000;
-  count = AIBoard.moves(m);
-  values[0] = 0;
-  
+			AIBoard.unchangeBoard();
 
-  
-  while(!stopThinking && currentDepth < MAX_SEARCH_DEPTH) {
-
-
-  if (currentDepth > 5)   
-  {
-	DBMoveToRawAlgebraicMove(m[0],buf2);
-	sprintf(buf, "pondering %s %6d [%2d-%2d]\n", buf2, values[0], currentDepth, currentDepth+(extensions/ONE_PLY));
-    output(buf);
-  }
-
-  extensions = 0; 
-
-  for(n = 0; n < count; n++) 
-  {
-
-	if (n && (currentDepth > 3) && (values[n-1] > values[n]+80)) extensions -= ONE_PLY;
-	  
-    AIBoard.changeBoard(m[n]);
-
-    values[n] = -search(-INFINITY, +INFINITY, FractionalDeep[currentDepth - 1] + extensions, 1, 1);
-
-    AIBoard.unchangeBoard();
-
-    if(stopThinking) break;
-
-  }
+			if(stopThinking) break;
+		}
 
 
     
-  if(stopThinking) break;
+		if(stopThinking) break;
 
-    /* Sort the moves based on the new values */
-
-    do {
-      done = 1;
-      for(n = 0; n < count - 1; n++) {
-        if(values[n + 1] > values[n]) {
-          tmp = m[n];
-          m[n] = m[n + 1];
-          m[n + 1] = tmp;
-          value = values[n];
-          values[n] = values[n + 1];
-          values[n + 1] = value;
-          done = 0;
-        }
-      }
-    } while(!done);
-    currentDepth++;
-
-  }
+		/* Sort the moves based on the new values */
+		do {
+			done = 1;
+			for(n = 0; n < count - 1; n++) if(values[n + 1] > values[n]) {
+				tmp = m[n];
+				m[n] = m[n + 1];
+				m[n + 1] = tmp;
+				value = values[n];
+				values[n] = values[n + 1];
+				values[n + 1] = value;
+				done = 0;
+			}
+		} while(!done);
+		currentDepth++;
+	}
   
-  pondering = 0;
+	pondering = 0;
 
-  output("\n");
-  if(currentDepth >= MAX_SEARCH_DEPTH) {
-    /* we've gone as far as we can, wait for it to be our move */
-    while(gameBoard.getColorOnMove() != gameBoard.getDeepBugColor())
-    waitForInput();
-  }
+	output("\n");
+	if(currentDepth >= MAX_SEARCH_DEPTH) {
+		/* we've gone as far as we can, wait for it to be our move */
+		while(gameBoard.getColorOnMove() != gameBoard.getDeepBugColor())
+		waitForInput();
+	}
   return;
 }
 
@@ -948,7 +942,7 @@ void ponder()
  *
  */
 
-inline void recursiveCheckEvasion(int *alpha, int *beta,int *bestValue, move *bestMove,int depthWithExtensions,int ply,move hashMove)
+void recursiveCheckEvasion(int *alpha, int *beta,int *bestValue, move *bestMove,int depthWithExtensions,int ply,move hashMove)
 
 {
 
@@ -968,7 +962,7 @@ inline void recursiveCheckEvasion(int *alpha, int *beta,int *bestValue, move *be
 	count += AIBoard.checkEvasionOthers(m+count);			
 
 	// if there is only 1 legal move 
-	if ((count == 1) || (!hashMove.isBad()) && (count == 2))
+	if ((count == 1) || ((count==2) && !hashMove.isBad() ))
 	{
 		depthWithExtensions += FORCING_EXTENSION; 
 		
@@ -1030,7 +1024,7 @@ inline void recursiveCheckEvasion(int *alpha, int *beta,int *bestValue, move *be
  *
  */
 
-inline int recursiveFullSearch(int *alpha, int *beta, int *bestValue, move *bestMove, int depthWithExtensions, int  ply, move hashMove)
+int recursiveFullSearch(int *alpha, int *beta, int *bestValue, move *bestMove, int depthWithExtensions, int  ply, move hashMove)
 
 {
 		int n, value, count; 
@@ -1055,8 +1049,7 @@ inline int recursiveFullSearch(int *alpha, int *beta, int *bestValue, move *best
 		
 		for ( n = 0; n < count; n++)
 		{
-			
-		if ((m[n] == hashMove) && (!hashMove.isBad())) continue; 
+		if (m[n] == hashMove) continue; 
 
 assert (!AIBoard.badMove(m[n]));
 		AIBoard.changeBoard(m[n]);	
@@ -1071,10 +1064,9 @@ assert (!AIBoard.badMove(m[n]));
 		if ( (AIBoard.isInCheck(AIBoard.getColorOnMove()))   
 			// a) we are checking the opp
 			 ||  (AIBoard.highestAttacked(m[n].to())) 
-			// b) we are attacking something with our move thats worth more than or the same as our moved piece, or less defendet. 
+			// b) we are attacking something with our move thats worth more than or the same as our moved piece, or is less defended. 
 			 ||  (AIBoard.escapingAttack(m[n].from(), m[n].to())) )
 			// c) we are escaping with the piece that got attacked in the move before
-			
 
 		{			
 
@@ -1092,13 +1084,8 @@ assert (!AIBoard.badMove(m[n]));
 				fprintf (fi[ply], buf3); 
 			}
 #endif	
-
-
 		}
-
 		else	// razor
-
-
 		{			
 			#ifdef DEBUG_STATS
 			stats_Razors++;
@@ -1118,10 +1105,8 @@ assert (!AIBoard.badMove(m[n]));
 			}
 			#endif	
 		}
-			
 	
 	
-			
 			if (value > *bestValue) 
 			{		
 				*bestValue = value;  
@@ -1130,14 +1115,11 @@ assert (!AIBoard.badMove(m[n]));
 			}						
 			
 			if (*bestValue > *alpha) *alpha = *bestValue; 
-			
 
 			if (*bestValue >= *beta) return 1;			
-			
-			
-		}		
 
-return 0; 
+		}		
+	return 0; 
 }
 
 
@@ -1199,8 +1181,7 @@ int recursiveSearch(int *alpha, int *beta,int *bestValue, move *bestMove,int dep
 	for(n = 0; n < count; n++) 
 	
 	{
-		if ((m[n] == hashMove) && (!hashMove.isBad())) continue; 
-
+		if (m[n] == hashMove) continue; 
 
 assert (!AIBoard.badMove(m[n]));
 		AIBoard.changeBoard(m[n]);
@@ -1255,16 +1236,14 @@ assert (!AIBoard.badMove(m[n]));
  *
  */
 
-inline int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,int depthWithExtensions,int ply,move  hashMove)
+int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,int depthWithExtensions,int ply,move  hashMove)
 
 {
 	int value; 
 
 
-	if (!hashMove.isBad())
-	
+	if (!hashMove.isBad() && !AIBoard.badMove(hashMove) )
 	{
-
 		#ifdef GAMETREE
 		if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
 		{ 
@@ -1272,10 +1251,7 @@ inline int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,i
 		}
 		#endif 
 
-
-assert (!AIBoard.badMove(hashMove));
 		AIBoard.changeBoard(hashMove);
-
 
 		#ifdef DEBUG_STATS
 		stats_MakeUnmake[HASH_MOVE]++;
@@ -1308,18 +1284,14 @@ assert (!AIBoard.badMove(hashMove));
 			*bestValue = value;  
 			*bestMove = hashMove;
 			savePrincipalVar(*bestMove, ply + 1);
-
 		}
 	
 		if (*bestValue > *alpha) *alpha = *bestValue; 
-	
-		
-	
 	}
 
 	if (*bestValue >= *beta) return 1; 
 
-return 0; 
+	return 0; 
 }
 
 
@@ -1350,13 +1322,9 @@ assert (alpha <= INFINITY);
 assert (beta <= INFINITY);
 assert (alpha >= -INFINITY);
 assert (beta >= -INFINITY);
-	
 assert (ply <= DEPTH_LIMIT);
   
-  
 #ifdef GAMETREE
-
-  
   char buf [MAX_STRING] ; 
   char buf2 [MAX_STRING] ; 
   char buf3 [MAX_STRING] ;
@@ -1399,26 +1367,28 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
   pv.depth[ply] = 0;
 
   if(stopThinking) { 
-					 #ifdef GAMETREE
-					 if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
-					 {
-						fprintf(fi[ply],"<br>Return: out of time<br></td></tr></table></html>\n");
-						fclose(fi[ply]); 
-					 }
-					 #endif   
-	  
-					return 0; }
+#ifdef GAMETREE
+		if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
+		{
+			fprintf(fi[ply],"<br>Return: out of time<br></td></tr></table></html>\n");
+			fclose(fi[ply]); 
+		}
+#endif   
 
-  if(AIBoard.isInCheck(AIBoard.getColorOffMove())) { 
-													#ifdef GAMETREE
-													if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
-														{	
-														fprintf(fi[ply],"<br>Return: Illegal Position: other side in check<br></td></tr></table></html>\n");
-														fclose(fi[ply]); 
-														}
-													#endif 
+		return 0;
+	}
 
-													return INFINITY; }
+	if(AIBoard.isInCheck(AIBoard.getColorOffMove()))
+	{ 
+#ifdef GAMETREE
+		if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
+		{	
+		fprintf(fi[ply],"<br>Return: Illegal Position: other side in check<br></td></tr></table></html>\n");
+		fclose(fi[ply]); 
+	}
+#endif 
+		return INFINITY;
+	}
 
   
 
@@ -1426,9 +1396,6 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 
   orgAlpha = alpha;
   orgBeta = beta;
-  
-
-
 
   if ((te = AIBoard.lookup()) != NULL) 
   
@@ -1450,7 +1417,7 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
        we return the value, otherwise we set best and alpha to the value
        returned last time since we know we can get at least that. 
        
-       If the serch failed low (All of it's decendants were at least as bad as
+       If the search failed low (All of it's decendants were at least as bad as
        alpha)then if the current alpha isn't lower than the value returned last
        time we return the value, otherwise we set beta to the value returned
        since we know we can't get better then that. */
@@ -1520,8 +1487,7 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
    */
   
 	if ((!wasNullMove) && (AIBoard.captureExtensionCondition()))
-				
-		{ 
+	{ 
 			extensions += CAPTURE_EXTENSION; 
 			
 			#ifdef DEBUG_STATS
@@ -1532,7 +1498,7 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 			if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
 			{ fprintf(fi[ply],"Capture extension: depth+ %d<br>\n", CAPTURE_EXTENSION); }
 			#endif	 
-		}
+	}
   
 
   /* In check.  */
@@ -1551,12 +1517,14 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 		#endif
 	 	
 		#ifdef GAMETREE
-		if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1))  { fprintf(fi[ply],"Check extension: depth + %d<br><br><hr><br>\n", CHECK_EXTENSION); }
+		if ((tree_positionsSaved<GAMETREE) && (currentDepth==FIXED_DEPTH - 1)) {
+			fprintf(fi[ply],"Check extension: depth + %d<br><br><hr><br>\n", CHECK_EXTENSION);
+		}
 		#endif	 
 	}
 
 	recursiveCheckEvasion(&alpha, &beta,&bestValue, &bestMove, depth+extensions, ply, hashMove); 				 
-  } 
+  }
   
   /* Not in Check */
 
@@ -1600,9 +1568,6 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 	  //  no Null moves for black + white after another.
 	  //  no Null move try if depth allows standpat
 	{
-	 
-
-
 		AIBoard.makeNullMove();
 
 		NullValue =  -search(-beta, -beta+1, depth - ((NULL_REDUCTION +1) * ONE_PLY), ply + 1, 1);	
@@ -1623,7 +1588,7 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 
 		if (NullValue >= beta) //	fail high even without making a move, this must
 						   //	be a very good position
-		{			                     
+		{
        
 			#ifdef GAMETREE
 			if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
@@ -1636,7 +1601,6 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 			#endif
 			
 			AIBoard.store((max (depth, 0)), bestMove, NullValue, orgAlpha, orgBeta);
-
 			return NullValue;
 
 		}	// End of successful NullMove try
@@ -1649,16 +1613,11 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 	{ fprintf(fi[ply],"<br><hr><br>\n"); }
 #endif
 
-
 	if ( (! recursiveHash(&alpha, &beta,&bestValue, &bestMove, depth+extensions, ply, hashMove)) && 
 		 (! recursiveSearch(&alpha, &beta,&bestValue, &bestMove, depth+extensions, ply, hashMove, ALL_CAP)) )
 		 recursiveFullSearch(&alpha, &beta,&bestValue, &bestMove, depth+extensions, ply, hashMove); 
 	
-
-
 	} // End of > depth CC_DEPTH left
-
-		
 	else 
 	{ 			
 			/* Stand pat 

@@ -52,8 +52,8 @@ extern int stats_hashSize;
 
 qword ssrandom64(void); 
 
-transpositionEntry *lookupTable[COLORS];
-transpositionEntry *learnTable[COLORS]; 
+transpositionEntry *lookupTable[COLORS]={NULL,NULL};
+transpositionEntry *learnTable[COLORS]={NULL,NULL}; 
 
 duword lookupMask;
 duword learnMask; 
@@ -233,14 +233,14 @@ int makeTranspositionTable(unsigned int size)
 
 
   learnTable[WHITE] = 
-    (transpositionEntry *) malloc(learnSize * sizeof(transpositionEntry));
+    (transpositionEntry *) calloc(learnSize, sizeof(transpositionEntry));
   learnTable[BLACK] = 
-    (transpositionEntry *) malloc(learnSize * sizeof(transpositionEntry));
+    (transpositionEntry *) calloc(learnSize, sizeof(transpositionEntry));
     
   lookupTable[WHITE] = 
-    (transpositionEntry *) malloc(size * sizeof(transpositionEntry));
+    (transpositionEntry *) calloc(size, sizeof(transpositionEntry));
   lookupTable[BLACK] = 
-    (transpositionEntry *) malloc(size * sizeof(transpositionEntry));
+    (transpositionEntry *) calloc(size, sizeof(transpositionEntry));
   
   if(!lookupTable[WHITE] || !lookupTable[BLACK] ||
 	 !learnTable[WHITE] || !learnTable[BLACK]) 
@@ -560,7 +560,7 @@ void boardStruct::addEnPassantHash(square sq)
  * Input:    How deep the search was, what the best move it found was, what it
  *           thought the value of the position was and what kind of value it
  *           was (fail-high, fail-low or exact), deduced from the original
- *			 alpha and beta values at the start of this search() iteration
+ *			 alpha and beta values at the start of the search() iteration
  *			 store() was called from.
  * Output:   None.
  * Purpose:  Stores the position in the transposition table so that it can
@@ -605,7 +605,7 @@ assert  (hashMoveCircle <= 7);
   // c) we got an exact score, and the position we overwrite doesnt
 
   // c) is a bit dubious, but only 1% are exact scores, and with a big 
-  // hash tablewe should be ok
+  // hash table we should be ok
   
   if ((hashMoveCircle != lookupTable[onMove][offset].moveNr) 
 	  || (depthSearched > lookupTable[onMove][offset].depth) 

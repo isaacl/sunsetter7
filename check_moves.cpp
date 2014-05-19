@@ -15,7 +15,7 @@
    from and a bitboard with the destination squares set it fills a move
    array and increments the pointer to that array */
 
-inline extern void fillMoveArray(move **m, square from, piece p,bitboard dest);
+extern void fillMoveArray(move **m, square from, piece p,bitboard dest);
 
 /* 
  * Function: checkEvasionCaptures
