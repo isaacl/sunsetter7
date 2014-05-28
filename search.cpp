@@ -1233,7 +1233,8 @@ assert (!AIBoard.badMove(m[n]));
 
 /* Function: recursiveHash()
  *
- *
+ * TODO: figure out and document what the return value from this actually means.
+ * and probably should merge this into the main search routine, seems redundant
  */
 
 int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,int depthWithExtensions,int ply,move  hashMove)
@@ -1242,7 +1243,7 @@ int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,int dept
 	int value; 
 
 
-	if (!hashMove.isBad() && !AIBoard.badMove(hashMove) )
+	if (!hashMove.isBad() && AIBoard.isLegal(hashMove) )
 	{
 		#ifdef GAMETREE
 		if ((tree_positionsSaved < GAMETREE) && (currentDepth == FIXED_DEPTH - 1)) 
@@ -1250,6 +1251,8 @@ int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,int dept
 			fprintf(fi[ply],"<br>Hash Move:<br><br>\n");
 		}
 		#endif 
+
+assert (!AIBoard.badMove(hashMove));
 
 		AIBoard.changeBoard(hashMove);
 
@@ -1287,7 +1290,7 @@ int recursiveHash(int *alpha,int *beta, int *bestValue , move *bestMove,int dept
 		}
 	
 		if (*bestValue > *alpha) *alpha = *bestValue; 
-	}
+	} else return 0; // else no valid hash entry found
 
 	if (*bestValue >= *beta) return 1; 
 

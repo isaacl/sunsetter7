@@ -131,7 +131,6 @@ void saveLearnTableToDisk()
  */
 
 void readLearnTableFromDisk()
-
 {
 
 	FILE *learnFile; 
@@ -147,7 +146,7 @@ void readLearnTableFromDisk()
 
 	sprintf (buf,"ss-%s.bin",VERSION); 
 	learnFile = fopen(buf, "rb");
-
+	memset(learnTable, 0, sizeof(learnTable));
  
 	if(!learnFile) 
 	{
@@ -715,28 +714,27 @@ transpositionEntry *boardStruct::lookup()
  * Input:    None.
  * Output:   a learn value used in findfirstmove() and findmove()
  * Purpose:  Used to find if we remember a lost or won game with that position
+ * note that bughouse games can not be learned this way, since the partner's
+ * position is not known and is very relevant.
  */
 
 int boardStruct::checkLearnTable()
 {
+	duword offset;
 
-  if ((!learning) || (currentRules == BUGHOUSE)) return 0; 
+	if ((!learning) || (currentRules == BUGHOUSE)) return 0; 
 
-  duword offset;
-	
-  offset = (duword) (hashValue & learnMask);
+	offset = (duword) (hashValue & learnMask);
 
-  if ((learnTable[onMove][offset].hash == hashValue >> 16)) 
-  { 
+	if ((learnTable[onMove][offset].hash == hashValue >> 16)) 
+	{ 
 	
 assert (learnTable[onMove][offset].value <= 1000);
 assert (learnTable[onMove][offset].value >= -1000); 
-  
 
-  return (learnTable[onMove][offset].value / 10 );
-
-  }
-  else return 0;
+		return (learnTable[onMove][offset].value / 10 );
+	}
+	return 0;
 }
 
 /* Function: saveLearnTable

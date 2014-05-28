@@ -52,5 +52,7 @@ evaluate.o: evaluate.cpp brain.h board.h evaluate.h interface.h
 
 interface.o: interface.cpp interface.h variables.h notation.h bughouse.h brain.h board.h
 	g++ $(CFLAGS) -c interface.cpp -o $@
+search.o: search.cpp board.h brain.h bughouse.h notation.h interface.h
+	g++ $(CFLAGS) -c search.cpp -o $@
 
 
