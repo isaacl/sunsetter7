@@ -119,66 +119,55 @@ assert ( pv.depth[ply] <= DEPTH_LIMIT );
 /* Function: PrincipalVariation::print
  * Input:    The board that the principal variation is from, the depth searched and the value.
  * Output:   None.
- * Purpose:  Used to print out information about the prinicpal variation.
+ * Purpose:  Used to print out information about the principal variation.
  */
 
 void printPrincipalVar(int valueReached)
 {
+	int n, timeUsed;
+	int variationLength = 0; 
+	char buf[MAX_STRING], emoticon[MAX_STRING];
+	char pvtxt[MAX_STRING];
+ 
+	endClockply =  getSysMilliSecs();
 
-  int n, timeUsed;
-  int variationLength = 0; 
-  char buf[MAX_STRING], buf2[MAX_STRING], emoticon[MAX_STRING];
-    
-  
-  endClockply =  getSysMilliSecs();
+	timeUsed = (endClockply-startClockply); 
+	if (((timeUsed / 10) < 2) && !analyzeMode) return; 
 
-  timeUsed = (endClockply-startClockply); 
-  if (((timeUsed / 10) < 2) && !analyzeMode) return; 
+	strcpy (pvtxt,""); 
 
-  strcpy (buf2,""); 
-
-  for(n = 0; n < pv.depth[0]; n++) 
-  {
-  
+	for(n = 0; n < pv.depth[0]; n++) 
+	{
 assert (!AIBoard.badMove(pv.moves[0][n]));
-
 		
 		AIBoard.changeBoard (pv.moves[0][n]); variationLength++; 
 
 		DBMoveToRawAlgebraicMove(pv.moves[0][n], buf);
-		sprintf (buf2, "%s%s ", buf2, buf);
+		strcat(pvtxt, buf); strcat(pvtxt," ");
 		if (variationLength == 9) 
 		{ 
-			sprintf(buf2,"%s ..",buf2); 
+			strcat(pvtxt, " ..");
 			break; 
-
 		}
-  
-  }
+	}
 
 
-  // kibitz mate announcements when the mate is deeper than 3 moves 
-  // on all other moves whisper the PV and the depth 
+	// kibitz mate announcements when the mate is deeper than 3 moves 
+	// on all other moves whisper the PV and the depth 
 
-  // don't display any info in bughouse
+	// don't display any info in bughouse
 	  
 
-  if ((currentRules == CRAZYHOUSE) && (stopThinking))
-		{ 
-	  
-	  
-	    if (valueReached > MATE)  
-
+	if ((currentRules == CRAZYHOUSE) && (stopThinking))
+	{ 
+		if (valueReached > MATE)  
 		{ 
 			if ((valueReached < MATE_IN_ONE-50) && xboardMode)
 			{
 				sprintf(buf, "\ntellics kibitz Mate in %d moves or less ! \n", ((MATE_IN_ONE-valueReached)/10));  
 				output(buf); 
 			}
-		}
-		
-		
-		else    { 
+		} else { 
 			if (valueReached > 500) 
 			{
 				sprintf (emoticon,":-))");  
@@ -196,42 +185,35 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 			output("\n\n"); 
 			if (xboardMode) 
 			{
-				sprintf(buf, "tellics whisper %s %2d: ", emoticon, currentDepth ); output(buf); 
+				sprintf(buf, "tellics whisper %s %2d: ",emoticon,currentDepth);
+				output(buf); 
 			}
-			output(buf2); AIBoard.getEval(buf);output(buf);  output("\n");   // the main line
-				}
+			// output the main line
+			output(pvtxt);
+			AIBoard.getEval(buf); output(buf);
+			output("\n");
 		}
-	else 
-		
-		{ 
+	} else { 
 		sprintf(buf, "%3d  %6d  %5d %8d ", currentDepth, valueReached, (timeUsed / 10), stats_positionsSearched); 		
 		
 
 		for(n = variationLength; n < 9; n++) 
-
 		{
-			sprintf(buf2,"%s     ",buf2); 
+			strcat(pvtxt,"     ");
 		}
 		
-		output(buf); output(buf2); 
+		output(buf); output(pvtxt); 
 		
 		if ((analyzeMode) && (timeUsed <200)) output("\r");  
 		else output("\n");  
-		}
+	}
 
-  
+	for(n = variationLength-1; n >= 0; n--) {
+		AIBoard.unchangeBoard();
+	}
 
-  
-  for(n = variationLength-1; n >= 0; n--) {
-      AIBoard.unchangeBoard();
-
-
-	
-  }
-
-  startClockply = getSysMilliSecs();
-  startClockAnalyze = startClockply; 
-
+	startClockply = getSysMilliSecs();
+	startClockAnalyze = startClockply; 
 }
 
 
@@ -247,10 +229,7 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 void analyzeUpdate()
 
 {
-
 	char buf [MAX_STRING], buf2 [MAX_STRING]; 
-
-	
 
 	if (((getSysMilliSecs()-startClockAnalyze) > 4000 ) && ((startClockAnalyze-startClockTime) > 200 ))
 
@@ -924,7 +903,7 @@ void ponder()
 		while(gameBoard.getColorOnMove() != gameBoard.getDeepBugColor())
 		waitForInput();
 	}
-  return;
+	return;
 }
 
 /* |-------------| ==> |------------------|

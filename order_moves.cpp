@@ -209,66 +209,65 @@ return;
  */
 
 move *boardStruct::orderCaptures(move *m)
-   {
-   move tmpMove;
-   int values[MAX_MOVES], done, count, tmpVal, i;
+{
+	move tmpMove;
+	int values[MAX_MOVES], done, count, tmpVal, i;
 
-   for (count = 0; !m[count].isBad(); count++)
-      {
-       if ( position[m[count].to()] != NONE )
-	   {
-		   values[count] =  captureGain(onMove, m[count]);
-	   }
-	   else 
-	   {
-		  // either a promotion, or an e.p. capture 
-		   // this estimation will do 
+	values[0]=0; // needed for the case of 0 moves
 
-		   values[count] = pValue[KNIGHT];
-	   }
-      }
+	for (count = 0; !m[count].isBad(); count++)
+	{
+		if ( position[m[count].to()] != NONE )
+		{
+			values[count] =  captureGain(onMove, m[count]);
+		} else {
+			// either a promotion, or an e.p. capture 
+			// this estimation will do 
+
+			values[count] = pValue[KNIGHT];
+		}
+	}
 
 
 
-   if (count < 2)
-   {
+	if (count < 2)
+	{
 
-	   // 20 is not a magic number :) 
-	   // it just makes sure that capturing a minor with a minor 
-	   // (R should be called minor in crazyhouse) is not considered 
-	   // a winning capture. 
+		// 20 is not a magic number :) 
+		// it just makes sure that capturing a minor with a minor 
+		// (R should be called minor in crazyhouse) is not considered 
+		// a winning capture. 
 
-     bestCaptureGain[moveNum] = max (0, values[0]);
-	   
-	 if (values[0] < +20) return m;
-	 else return m + count;
-   }
+		bestCaptureGain[moveNum] = max (0, values[0]);
 
-   /* Sort the captures */
+		if (values[0] < +20) return m;
+		else return m + count;
+	}
 
-   do
-      {
-      done = 1;
-      for (i = 0; i < count - 1; i++)
-         if ((values[i]) < values[i + 1])
-            {
-            done = 0;
-            tmpVal = values[i];
-            values[i] = values[i + 1];
-            values[i + 1] = tmpVal;
-            tmpMove = m[i];
+	/* Sort the captures */
+	do
+	{
+		done = 1;
+		for (i = 0; i < count - 1; i++)
+			if ((values[i]) < values[i + 1])
+		{
+			done = 0;
+			tmpVal = values[i];
+			values[i] = values[i + 1];
+			values[i + 1] = tmpVal;
+
+			tmpMove = m[i];
 			m[i] = m[i + 1];
-            m[i + 1] = tmpMove;
+			m[i + 1] = tmpMove;
+		}
+	} while(!done);
 
-            }
-      } while(!done);
+	bestCaptureGain[moveNum] = max (0, values[0]);
 
-   bestCaptureGain[moveNum] = max (0, values[0]);
-
-   if (values[0] < +20)
-      return m;
-   while (values[count - 1] < +20)
-      count--;
-   return m + count;
-   }
+	if (values[0] < +20)
+		return m;
+	while (values[count - 1] < +20)
+		count--;
+	return m + count;
+}
 

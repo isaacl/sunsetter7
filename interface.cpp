@@ -91,7 +91,6 @@ void sleep(int n)
 
 #define eStop    -1
 static int state;      // number of requests available in the buffer
-int inputWait = 0;
 
 char buf[MAX_STRING];
 char *pStart, *pEnd;
@@ -159,7 +158,7 @@ int Input(char *str)
 
 // InitInput         // start thread, init globals
 void InitInput()
-   {
+{
 
    DWORD idThread;
    InitializeCriticalSection(&critSec);
@@ -167,7 +166,7 @@ void InitInput()
    state = 0;
 
    hThread = CreateThread(NULL, 0, RunInput, NULL, 0, &idThread);
-   }
+}
 
 
 void ShutdownInput()
@@ -206,11 +205,9 @@ void ShutdownInput()
  */
 
 void waitForInput()
-   {
-   inputWait = 1;
-   while (!checkInput()){};
-   inputWait = 0;
-   }
+{
+	while (!checkInput()){};
+}
 
 
 /* 
@@ -224,50 +221,29 @@ void waitForInput()
  */
 
 int checkInput()
-   {
-   struct timeval tv;
-   int fd, wasInput;
+{
+   int wasInput;
    char str[MAX_STRING];
 
 
    wasInput = 0;
-   if (inputWait)
-      {
-      tv.tv_sec = 1000;
-      tv.tv_usec = 0;
-      }
-   else if (!gameInProgress || forceMode || analyzeMode)
-      {           // If we're not playing a game then
-                  //    we can wait a while for input 
-      tv.tv_sec = 1;
-      tv.tv_usec = 0;
-      }
-   else
-      {
-      tv.tv_sec = 0;
-      tv.tv_usec = 0;
-      }
-
-
-      fd = 0;
 
    if (gameBoard.timeToMove()) stopThought();
 
    if (analyzeMode && gameInProgress) analyzeUpdate(); 
 
-   if (!hThread)
-      {
-      InitInput();
-      }
-   while (Input(str))
-      {
-      wasInput = 1;
-      parseOption(str);
-
-      }
+	if (!hThread)
+	{
+		InitInput();
+	}
+	while (Input(str))
+	{
+		wasInput = 1;
+		parseOption(str);
+	}
 
    return wasInput;
-   }
+}
 
 
 #endif
@@ -327,17 +303,18 @@ int Input(char *str)
 	return 0;
 }
 
+/*
+ * Function: waitForInput
+ * Input:    None
+ * Output:   None
+ * Purpose:  Does nothing until some kind of input comes in.  Used when
+ *           there's nothing to do (someone has forced mate for instance).
+ */
 void waitForInput()
 {
-	fd_set stdin_holder;
-
-	FD_ZERO(&stdin_holder); FD_SET(0, &stdin_holder);
-	// wait for input.
-	select(1, &stdin_holder, NULL, NULL, NULL);
-	/* not guaranteed to have stdin available now since I didn't
-	 * check the return value, but really likely */
+	// while no input, sleep for 1/1000 seconds
+	while (!checkInput())usleep(1000);
 }
-
 
 /* 
  * Function: checkInput
@@ -359,6 +336,8 @@ int checkInput()
                      
    if(gameBoard.timeToMove()) stopThought();
 
+   if (analyzeMode && gameInProgress) analyzeUpdate(); 
+
    while (Input(str))
    {
       wasInput = 1;
@@ -367,7 +346,6 @@ int checkInput()
 
    return wasInput;
 }
-
 
 #endif
 
@@ -431,9 +409,7 @@ void output(const char *str)
  */
 
 void reportResult(result res)
-   {
-
-
+{
 
    switch (res) 
       {

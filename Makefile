@@ -6,14 +6,14 @@
 # -g turns on debugging data in the executable.
 # -DNDEBUG turns off assert() debugging in the code
 #
-# CFLAGS for a "release" built, no debugging and highly optimized.
+# uncomment this for a "release" build with no debugging and highly optimized.
 # CFLAGS = -O3 -DNDEBUG
 #
-# uncomment this line to build a debug version.
+# uncomment this line to build a full debug version(slow, more likely to crash).
 # need to type "make clean;make" to get the full effect
-#CFLAGS = -Wall -g -O1 -DDEBUG
+#CFLAGS = -Wall -g -DDEBUG
 #
-# or this one for a "light debug" version which works well with gdb
+# or this one for a "light debug" version, works with gdb
 # but is otherwise like the release version.
 CFLAGS = -Wall -g -O1 -DNDEBUG
 #
