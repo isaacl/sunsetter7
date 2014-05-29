@@ -32,6 +32,7 @@
 
 #include <time.h>      
 #include <memory.h>         // for mem*() functions
+#include <assert.h>
 
 
 #include "definitions.h"
@@ -222,7 +223,6 @@ struct bitboard {
 __forceinline int firstSquare (qword a) 
    
 {
-
 	// bitboard must NOT be empty !
 
 	__asm { 
@@ -235,25 +235,48 @@ __forceinline int firstSquare (qword a)
 
 #pragma warning( default : 4035 )
 
-#else
+#elif defined(__i386__)
+
 static inline
 int firstSquare (qword a)
 {
+// code for 32bit Intel type cpus.
 	register int res;
 	union {
 		unsigned long long x;
 		unsigned long y[2];
 	} z;
 	z.x=a;
+assert(a!=0); // bsf doesn't work on 0, which has no bits set.
 	__asm__(
 		"bsf    %1,%0\n\t"
 		"addl   $32, %0\n\t"
 		"bsf    %2,%0\n\t"
 		: "=&r" (res)
-		: "r" (z.y[1]), "g" (z.y[0])
+		: "g" (z.y[1]), "g" (z.y[0])
+		: "cc"
 	);
 	return res;
 }
+#elif defined(__x86_64__)
+// code for 64bit Athlon type cpus
+static inline
+int firstSquare (qword a)
+{
+	register qword res;
+assert(a!=0); // bsf doesn't work on 0, which has no bits set.
+	__asm__(
+		"bsfq %1, %0\n\t"
+		: "=r" (res)
+		: "g" (a)
+		: "cc");
+	return (int)res;
+}
+#else
+#error not a supported architecture
+	// If someone wants to support non-intel architectures, there are some (slower) C versions
+	// at  https://chessprogramming.wikispaces.com/BitScan
+	// one of which could be used here.
 #endif
 
 
