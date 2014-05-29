@@ -30,6 +30,9 @@
 #include "notation.h"
 #include "interface.h"
 
+// number of times to do each test in the speedtest
+#define REPEATCOUNT (40000)
+
 /* Function: nextToken
  * Input:    A file and a string to fill
  * Output:   None
@@ -238,175 +241,144 @@ for(;;)    // go through the whole game
 
 int speedtest(int argc, char **argv)
 {
- char buf[MAX_STRING], buf2[MAX_STRING]; 
- move gameMoves[MAX_GAME_LENGTH];
- int a, n;
- int makeUnmakeSpeed; 
+	char buf[MAX_STRING], buf2[MAX_STRING]; 
+	move gameMoves[MAX_GAME_LENGTH];
+	int a, n;
+	int makeUnmakeSpeed; 
+
+	FILE *fin; 
+	move m;
+	move moves[MAX_MOVES]; 
+
+	clock_t startClockTime, endClockTime;
+
+	int movesInGame = 0;
+
+	if ((argc < 2) || (argc > 3)) {   
+		output("Usage:\n");
+		output("sunsetter speedtest <input file>");
+		return (1);
+	}
  
- FILE *fin; 
- move m;
- move moves[MAX_MOVES]; 
 
- clock_t startClockTime, endClockTime;
+	fin = fopen(argv[2], "rt");   // open the input file
+	if(fin){
+		printf("starting speedtest on file %s\n", argv[2]);
+	} else {
+		printf("failed to open file %s for speedtest\n", argv[2]);
+		return 1;
+	}
 
- int movesInGame = 0;
-
- if ((argc < 2) || (argc > 3)) {   
-    output("Usage:\n");
-    output("sunsetter speedtest <input file>");
-    return (1);
-    }
- 
-
-fin = fopen(argv[2], "rt");   // open the input file
-
-
-
-for(;;)    // go through the whole game
-
-{
-
-	if (nextMoveOrResult(fin, 'A', buf)) 
+	for(;;)    // go through the whole game
 	{
-          output("  EOF \n\n");
-          break;
-    }
-
-	if (strcmp(buf, "OVER"))
-	{
-	
-		if (gameBoard.getColorOnMove() == WHITE) 
-		{ 
-			sprintf (buf2, "%d.", (gameBoard.getMoveNum() / 2)+1 ); output (buf2); 
-		}
-		
-		m = gameBoard.algebraicMoveToDBMove(buf);
-
-		if(gameBoard.playMove(m, 0)) 
+		if (nextMoveOrResult(fin, 'A', buf)) 
 		{
-          output("Illegal move in file: ");
-		  output(buf); 
-		  output("\n");
-          break;
-        }
+			output("  EOF \n\n");
+			break;
+		}
 
-		movesInGame++;
-		gameMoves[movesInGame] = m;
-	
-		output (buf);
-		output (" ");
+		if (strcmp(buf, "OVER"))
+		{
+			if (gameBoard.getColorOnMove() == WHITE) 
+			{ 
+				sprintf (buf2, "%d.",
+					(gameBoard.getMoveNum() / 2)+1 ); output (buf2); 
+			}
+		
+			m = gameBoard.algebraicMoveToDBMove(buf);
 
+			if(gameBoard.playMove(m, 0)) 
+			{
+				output("Illegal move in file: ");
+				output(buf); 
+				output("\n");
+				break;
+			}
+
+			movesInGame++;
+			gameMoves[movesInGame] = m;
+
+			output (buf);
+			output (" ");
+		} else break; 
 	}
-	
-    else
+
+	output ("\n\n Game stored, starting makeUnmake speed test ... \n"); 
+
+	startClockTime = getSysMilliSecs();
+
+	for (a = 0; a < REPEATCOUNT; a++)
 	{
-		break; 
+		for (n = movesInGame; n >= 1; n--) 
+		{
+			gameBoard.unchangeBoard(); 		
+		}	
+
+		for (n = 1; n <= movesInGame; n++) 
+		{
+			gameBoard.changeBoard(gameMoves[n]); 				
+		}
 	}
-	
 
-}
+	endClockTime = getSysMilliSecs();
 
-output ("\n\n Game stored, starting makeUnmake speed test ... \n"); 
+	makeUnmakeSpeed = (int) (endClockTime - startClockTime);
 
-startClockTime = getSysMilliSecs();
+	sprintf (buf, "%d make/unmake at ", movesInGame * REPEATCOUNT );
+	output (buf); 
+	sprintf (buf, "%d make/unmake per second. \n",
+		(((movesInGame * REPEATCOUNT) / (makeUnmakeSpeed)) * 1000 ) ); 
+	output (buf); 
 
-for (a = 0; a < 10000; a++)
-
-{
+	output ("\n\n starting eval() speed test ... \n"); 
+	startClockTime = getSysMilliSecs();
 
 	for (n = movesInGame; n >= 1; n--) 
-
 	{
-		 gameBoard.unchangeBoard(); 		
+		gameBoard.unchangeBoard(); 
+		for (a = 0; a < REPEATCOUNT; a++) gameBoard.eval(); 
 	}	
 
 	for (n = 1; n <= movesInGame; n++) 
-
 	{
 		gameBoard.changeBoard(gameMoves[n]); 				
+		for (a = 0; a < REPEATCOUNT; a++) gameBoard.eval(); 
 	}
 
-}
+	endClockTime = getSysMilliSecs();
 
-endClockTime = getSysMilliSecs();
+	sprintf (buf, "%d eval() at ", movesInGame * REPEATCOUNT *2);
+	output (buf); 
+	sprintf (buf, "%d eval per second. \n",
+	( ((movesInGame * REPEATCOUNT *2) / (((int) (endClockTime - startClockTime)))) * 1000 ) ); 
+	output (buf); 
 
-makeUnmakeSpeed = (int) (endClockTime - startClockTime);
+	output ("\n\n starting MoveGen speed test ... \n"); 
 
-sprintf (buf, "%d make/unmake at ", movesInGame * 10000 );
-output (buf); 
-sprintf (buf, "%d make/unmake per second. \n", (    ((movesInGame * 10000) / (makeUnmakeSpeed)) * 1000 ) ); 
-output (buf); 
-
-output ("\n\n starting eval() speed test ... \n"); 
-
-
-startClockTime = getSysMilliSecs();
-
-for (a = 0; a < 10000; a++)
-
-{
+	startClockTime = getSysMilliSecs();
 
 	for (n = movesInGame; n >= 1; n--) 
-
 	{
-		 gameBoard.unchangeBoard(); 
-		 gameBoard.eval(); 
+		gameBoard.unchangeBoard(); 
+		for (a = 0; a < REPEATCOUNT; a++) AIBoard.aiMoves(moves);
 	}	
 
 	for (n = 1; n <= movesInGame; n++) 
-
 	{
 		gameBoard.changeBoard(gameMoves[n]); 				
-		gameBoard.eval(); 
+		for (a = 0; a < REPEATCOUNT; a++) AIBoard.aiMoves(moves);
 	}
 
-}
+	endClockTime = getSysMilliSecs();
 
-endClockTime = getSysMilliSecs();
+	sprintf (buf, "%d MoveGen at ", movesInGame * REPEATCOUNT *2);
+	output (buf); 
+	sprintf (buf, "%d MoveGen per second. \n",
+		( ((movesInGame * REPEATCOUNT *2) / (((int) (endClockTime - startClockTime)))) * 1000 ) ); 
+	output (buf); 
 
-sprintf (buf, "%d eval() at ", movesInGame * 10000 *2);
-output (buf); 
-sprintf (buf, "%d eval per second. \n", (    ((movesInGame * 10000 *2) / (((int) (endClockTime - startClockTime))- makeUnmakeSpeed)) * 1000 ) ); 
-output (buf); 
+	fclose(fin);
 
-output ("\n\n starting MoveGen speed test ... \n"); 
-
-
-
-startClockTime = getSysMilliSecs();
-
-for (a = 0; a < 10000; a++)
-
-{
-
-	for (n = movesInGame; n >= 1; n--) 
-
-	{
-		 gameBoard.unchangeBoard(); 
-		 AIBoard.aiMoves(moves);
-		 
-	}	
-
-	for (n = 1; n <= movesInGame; n++) 
-
-	{
-		gameBoard.changeBoard(gameMoves[n]); 				
-		AIBoard.aiMoves(moves);
-	}
-
-}
-
-endClockTime = getSysMilliSecs();
-
-sprintf (buf, "%d MoveGen at ", movesInGame * 10000 *2);
-output (buf); 
-sprintf (buf, "%d MoveGen per second. \n", (    ((movesInGame * 10000 *2) / (((int) (endClockTime - startClockTime))- makeUnmakeSpeed)) * 1000 ) ); 
-output (buf); 
-
-
-fclose(fin);
-
-
-return(0);        
+	return(0);        
 }
 
