@@ -64,8 +64,7 @@ void nextToken(FILE *f, char *str)
 
     return;
   }
-  fscanf(f, "%s", buf);
-  strcat(str, buf);
+  if(fscanf(f, "%s", buf)!= EOF) strcat(str, buf);
   return;
 }
 
