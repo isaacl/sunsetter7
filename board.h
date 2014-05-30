@@ -333,18 +333,16 @@ struct takeBackInfo {
 #endif
 
 struct transpositionEntry {
+  qword hash : 48;          /* The upper 48 bits of the hash value of the  position. */
+  move hashMove;            /* The best move last time */
+  sword value;              /* The value of the position */
+  byte depth;				/* How deep the position was searched */
   byte type : 4;			/* fail low, high, or exact */
   byte moveNr : 4;			/* to check whether an entry can be overwritten */
-  byte depth;				/* How deep the position was searched */
 
-  sword value;              /* The value of the position */
-  qword hash : 48;          /* The upper 48 bits of the hash value of the  position. */
 #ifdef DEBUG_HASH   
   qword hashT : 48;			/* To check for hash collisions */
 #endif
-
-  move hashMove;            /* The best move last time */
-
 };
 
 #ifdef _win32_
