@@ -377,7 +377,7 @@ bitboard boardStruct::blockedAttacks(color c, square where)
  */
 
 void initBitboards()
-   {
+{
    int leftborder, rightborder, upperborder, lowerborder; 
    int n, o, i;
    bitboard bb, bb2;
@@ -387,8 +387,8 @@ void initBitboards()
    /* First generate the Square -> Bitboard with only that square set 
       Lookup table, makes setting / unsetting squares MUCH faster */
 	
-     for (sq = 0; sq < (SQUARES+1); sq++) 
-     { BitInBB[sq] = (qword(1) << (sq)); }
+	for (sq = 0; sq < SQUARES; sq++) 
+		BitInBB[sq] = (qword(1) << sq);
 
    /* Generate the attacks of short range pieces.  Just make sure that the
       attacks dont wrap around the board */
@@ -733,7 +733,7 @@ void initBitboards()
    }
 
    return;
-   }
+}
 
 
 /* 
