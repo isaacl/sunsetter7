@@ -313,16 +313,16 @@ main(int argc, char **argv)
 
 void ReadIniFile(char *filename) 
 {
-	char parambuf[MAX_STRING]; 
+	char parambuf[MAX_STRING]=""; 
 	FILE *inif;	
 
-  inif = findFile(filename, "rt");
-  if(inif) {	  
-	  while(!feof(inif)) {
-      strcpy(parambuf, "");
-      fgets(parambuf, MAX_STRING, inif);
-      parseOption(parambuf);
-    }
+	inif = findFile(filename, "rt");
+	if(inif) {	  
+		while(!feof(inif)) {
+			if(!fgets(parambuf, MAX_STRING, inif)) break;
+			parseOption(parambuf);
+		}
+		fclose(inif); inif=NULL;
 	}
 }
 
