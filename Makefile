@@ -28,31 +28,60 @@ sunsetter: $(OBJECTS) Makefile
 clean:
 	rm $(OBJECTS)
 
-# a general purpose dependancy for makeing .o files from .cpp files
-.cpp.o: board.h
-	g++ $(CFLAGS) -c $<
-
-# more detailed dependancies below for a few critical files
 
 aimoves.o: aimoves.cpp definitions.h variables.h board.h brain.h interface.h
 	g++ $(CFLAGS) -c aimoves.cpp -o $@
+
+bitboard.o: bitboard.cpp board.h bughouse.h interface.h brain.h
+	g++ $(CFLAGS) -c bitboard.cpp -o $@
 
 board.o: board.cpp board.h brain.h interface.h definitions.h bughouse.h \
 	variables.h notation.h
 	g++ $(CFLAGS) -c board.cpp -o $@
 
-bitboard.o: bitboard.cpp board.h bughouse.h interface.h brain.h
-	g++ $(CFLAGS) -c bitboard.cpp -o $@
+book.o: book.cpp variables.h definitions.h board.h
+	g++ $(CFLAGS) -c book.cpp -o $@
 
 bughouse.o: bughouse.cpp variables.h definitions.h board.h interface.h bughouse.h brain.h
 	g++ $(CFLAGS) -c bughouse.cpp -o $@
 
-evaluate.o: evaluate.cpp brain.h board.h evaluate.h interface.h
+capture_moves.o: capture_moves.cpp board.h brain.h
+	g++ $(CFLAGS) -c capture_moves.cpp -o $@
+
+check_moves.o: check_moves.cpp board.h
+	g++ $(CFLAGS) -c check_moves.cpp -o $@
+
+evaluate.o: evaluate.cpp brain.h board.h evaluate.h
 	g++ $(CFLAGS) -c evaluate.cpp -o $@
 
 interface.o: interface.cpp interface.h variables.h notation.h bughouse.h brain.h board.h
 	g++ $(CFLAGS) -c interface.cpp -o $@
+
+moves.o: moves.cpp interface.h variables.h board.h
+	g++ $(CFLAGS) -c moves.cpp -o $@
+
+notation.o: notation.cpp bughouse.h notation.h interface.h board.h brain.h variables.h
+	g++ $(CFLAGS) -c notation.cpp -o $@
+
+order_moves.o: order_moves.cpp board.h brain.h interface.h notation.h
+	g++ $(CFLAGS) -c order_moves.cpp -o $@
+
+partner.o: partner.cpp board.h brain.h interface.h notation.h
+	g++ $(CFLAGS) -c partner.cpp -o $@
+
+quiescense.o: quiescense.cpp board.h brain.h interface.h variables.h notation.h
+	g++ $(CFLAGS) -c quiescense.cpp -o $@
+
 search.o: search.cpp board.h brain.h bughouse.h notation.h interface.h
 	g++ $(CFLAGS) -c search.cpp -o $@
+
+tests.o: tests.cpp board.h brain.h notation.h interface.h
+	g++ $(CFLAGS) -c tests.cpp -o $@
+
+transposition.o: transposition.cpp interface.h definitions.h board.h notation.h brain.h
+	g++ $(CFLAGS) -c transposition.cpp -o $@
+
+validate.o: validate.cpp interface.h board.h bughouse.h
+	g++ $(CFLAGS) -c validate.cpp -o $@
 
 
