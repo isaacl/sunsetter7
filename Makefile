@@ -29,7 +29,7 @@ clean:
 	rm $(OBJECTS)
 
 # a general purpose dependancy for makeing .o files from .cpp files
-.cpp.o:
+.cpp.o: board.h
 	g++ $(CFLAGS) -c $<
 
 # more detailed dependancies below for a few critical files
