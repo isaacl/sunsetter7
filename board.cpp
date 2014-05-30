@@ -680,29 +680,23 @@ void boardStruct::copy(boardStruct *dest)
 int boardStruct::playMove(move m, int report)
 {
 
-   int capturedPromotedPawn;
+	if (!isLegal(m)) return -1;
 
-   if (!isLegal(m))
-      return -1;
-
-   changeBoard(m); 
+	changeBoard(m); 
 
 
-   if (currentRules == BUGHOUSE)
-      { 
-				/* Do stuff to keep track of promotions.  
+	if (currentRules == BUGHOUSE)
+	{ 
+		/* Do stuff to keep track of promotions.  
                 This is done in changeBoard() in crazyhouse
                 but for bug it's not so important for the
                 search, so time isn't taken up in
                 changeBoard() and it's done here. */
 
-      if (promotedPawns.squareIsSet(m.to()))
-         {
-         promotedPawns.unsetSquare(m.to());
-         capturedPromotedPawn = 1;
-         }
-      else
-         capturedPromotedPawn = 0;
+		if (promotedPawns.squareIsSet(m.to()))
+		{
+			promotedPawns.unsetSquare(m.to());
+		}
     
       if (promotedPawns.squareIsSet(m.from()))
          {
