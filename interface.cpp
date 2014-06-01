@@ -568,36 +568,35 @@ void parseOption(const char *str)
    /* Process the other options */
 
 	if (!strcmp(arg[0], "xboard")) 
-		{
+	{
 		xboardMode = 1; 
-		}
-  
+	}
 	else if (!strcmp(arg[0], "learn")) 
-		{
+	{
 		learning = 1; 
 		readLearnTableFromDisk(); 
 		output("Learning is on.\n");
-		}
-
+	}
 	else if (!strcmp(arg[0], "analyze")) 
-		{
+	{
 		analyzeMode = 1;      
 		forceMode = 0; 
-
-		}
-   
-	else if (!strcmp(arg[0], "hard")) 
-		{
+		gameBoard.setDeepBugColor(gameBoard.getColorOnMove());         
+		gameBoard.setLastMoveNow();
+		startSearchOver();
+	}
+	else if (!strcmp(arg[0], "exit"))
+	{
+		analyzeMode = 0;
+		forceMode = 1; 
+	} else if (!strcmp(arg[0], "hard")) 
+	{
 		tryToPonder = 1;
-		} 
-   
-	else if (!strcmp(arg[0], "easy")) 
-		{
+	} else if (!strcmp(arg[0], "easy")) 
+	{
 		tryToPonder = 0;
-		} 
-   
-	else if (strstr(arg[0], "result") == arg[0]) 
-		{      
+	} else if (strstr(arg[0], "result") == arg[0]) 
+	{      
 #ifdef DEBUG_XBOARD
 		output ("//D: result parsed, saving learn info, resetting AI\n"); 
 #endif
@@ -637,30 +636,21 @@ void parseOption(const char *str)
 		  } 
 		}
 		}
-
-	  
 	  
 	  resetAI();
       gameInProgress = 0;
-
-      } 
-   
-   else if (!strcmp(arg[0], "new") ||
+	} 
+	else if (!strcmp(arg[0], "new") ||
             !strcmp(arg[0], "accept")) 
 		
-		{	  	
-
-
+	{	  	
 #ifdef DEBUG_XBOARD
 		output ("//D: new or accept parsed, ignoring\n"); 
 #endif
-		}
-
-
-
+	}
    else if(!strcmp(arg[0], "variant") ||
            !strcmp(arg[0], "reset")) 
-      {
+	{
 
 
 	  if (xboardMode && !analyzeMode) 
@@ -686,41 +676,37 @@ void parseOption(const char *str)
 	  }
 
 	  output (" \n");
-		
-	  	  
+
 
 	  stopThought(); 
 	  gameBoard.resetBoard();
       zapHashValues();
       resetAI();
-	  
-
  
       gameInProgress = 1;
 	  soughtGame = 0; 
 
 
-
 #ifdef DEBUG_XBOARD
 output ("//D: variant parsed, board reset and set to bug or zh \n"); 
 #endif
-			if (!strcmp(arg[1], "bughouse")) 
-				{				
-				currentRules = BUGHOUSE;
-				gameBoard.playBughouse();
-				}
-			else       
-				{         
-				currentRules = CRAZYHOUSE;
-				gameBoard.playCrazyhouse();         
-				}
+		if (!strcmp(arg[1], "bughouse")) 
+		{
+			currentRules = BUGHOUSE;
+			gameBoard.playBughouse();
+		}
+		else
+		{
+			currentRules = CRAZYHOUSE;
+			gameBoard.playCrazyhouse();
+		}
 
-	  if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());         
+	  if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
 
-      }
-  
-   else if (!strcmp(arg[0], "partner")) 
-      {
+	}
+
+	else if (!strcmp(arg[0], "partner")) 
+	{
       if (!strcmp(arg[1], "")) 
          {
          strcpy(partnerName, "");
@@ -741,63 +727,60 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
          output("tellics set formula f4 && f1 \n");
          output("tellics unseek\n");
          };
-      } 
-   else if (!strcmp(arg[0], "?")) 
-      {
+	} 
+	else if (!strcmp(arg[0], "?")) 
+	{
       unsit();
       stopThought();
       forceDeepBugToMove();
-      }
-
-   else if (!strcmp(arg[0], "resign")) 
-      {
+	}
+	else if (!strcmp(arg[0], "resign")) 
+	{
       if (gameBoard.getDeepBugColor() == WHITE)
          reportResult(BLACK_RESIGNATION);
       else 
          reportResult(WHITE_RESIGNATION);
       gameInProgress = 0;
-      }
-	
+	}
    else if(!strcmp(arg[0], "personality")) 
-   {
-   output("found personality\n"); 
-   strcpy(personalityIni[PERSONALITY], arg[1]); 
-   PERSONALITY ++; 
-   }   
-   
-   else if(!strcmp(arg[0], "hash")) 
-      {	  
-      if (makeTranspositionTable(atoi(arg[1]) * 1024 * 1024) == -1)
-         makeTranspositionTable(MIN_HASH_SIZE); 
-		 /* There was an error, so make the
-                  table the minimum size. */
-      }
-
+	{
+		output("found personality\n"); 
+		strcpy(personalityIni[PERSONALITY], arg[1]); 
+		PERSONALITY ++; 
+	}   
+	else if(!strcmp(arg[0], "hash")) 
+	{	  
+		if (makeTranspositionTable(atoi(arg[1]) * 1024 * 1024) == -1)
+			makeTranspositionTable(MIN_HASH_SIZE); 
+		 /* There was an error, so make the table the minimum size. */
+	}
    else if (!strcmp(arg[0], "tellics"))
-		{ output("\ntellics "); output(arg[1]); output("\n");  }
-   
-
+	{
+		output("\ntellics "); output(arg[1]); output("\n");
+	}
    else if (!strcmp(arg[0], "rating")) 
-		{ 
+	{ 
 			ratingDiff = atoi(arg[1]) - atoi(arg[2]); 
 
 #ifdef DEBUG_XBOARD
 			sprintf(buf, "//D: rating parsed, Diff: %d \n", ratingDiff); 
 			output (buf); 
 #endif 
-		}
-	
+	}
    else if(!strcmp(arg[0], "sd"))
-	  { FIXED_DEPTH = atoi(arg[1]); }
-
+	{
+		FIXED_DEPTH = atoi(arg[1]);
+	}
    else if(!strcmp(arg[0], "nullreduct"))
-	  { NULL_REDUCTION = atoi(arg[1]); }
-
+	{
+		NULL_REDUCTION = atoi(arg[1]);
+	}
    else if(!strcmp(arg[0], "capext"))
-	  { CAPTURE_EXTENSION = atoi(arg[1]); }
-   
+	{
+		CAPTURE_EXTENSION = atoi(arg[1]);
+	}
    else if(!strcmp(arg[0], "checkext"))
-	  { CHECK_EXTENSION = atoi(arg[1]); }
+	{ CHECK_EXTENSION = atoi(arg[1]); }
 
    else if(!strcmp(arg[0], "forceext"))
 	  { FORCING_EXTENSION = atoi(arg[1]); }
@@ -830,52 +813,45 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
       gameBoard.setTime(otherColor(gameBoard.getDeepBugColor()), atoi(arg[1]) *10);
     
    else if(!strcmp(arg[0], "white")) 
-      {
+	{
       gameBoard.setColorOnMove(WHITE);
       gameBoard.setDeepBugColor(BLACK);
-      } 
+	} 
    else if (!strcmp(arg[0], "black")) 
-      {
+	{
       gameBoard.setColorOnMove(BLACK);
       gameBoard.setDeepBugColor(WHITE);
-      }
-
+	}
    else if (!strcmp(arg[0], "go")) 
-      {
-      if (gameInProgress) 
-         {
-         forceMode = 0;
-		 analyzeMode = 0; 
-		 gameBoard.setDeepBugColor(gameBoard.getColorOnMove());         
-		 gameBoard.setLastMoveNow();
-         startSearchOver();
-         }
-      }
-
-   else if (!strcmp(arg[0], "quit") || !strcmp(arg[0], "exit")) 
-      {
+	{
+		if (gameInProgress) 
+		{
+			forceMode = 0;
+			analyzeMode = 0; 
+			gameBoard.setDeepBugColor(gameBoard.getColorOnMove());         
+			gameBoard.setLastMoveNow();
+			startSearchOver();
+		}
+	}
+   else if (!strcmp(arg[0], "quit") ) 
+	{
 	  if (learning) saveLearnTableToDisk(); 
 
 #ifdef _win32_      
-
 	  ShutdownInput();
-
 #endif
 	  
 	  exit(0);
-      }
-  
+	}
    else if (!strcmp(arg[0], "undo")) 
-      {
-      if (gameBoard.unplayMove()) 
-       output("Cannot undo move\n");
-	  stopThought();
-	  if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());         
-
-      }
-  
-   else if (!strcmp(arg[0], "remove")) 
-      {
+	{
+		if (gameBoard.unplayMove()) 
+			output("Cannot undo move\n");
+		stopThought();
+		if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
+	}
+	else if (!strcmp(arg[0], "remove")) 
+	{
       if (gameBoard.getMoveNum() < 3) 
          {
          output("Cannot remove last move\n");
@@ -886,30 +862,26 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
          gameBoard.unplayMove();
 		 stopThought();
          }
+	}
+	else if (!strcmp(arg[0], "force")) 
+	{
+		forceMode = 1; 
 
-      }
+		if (gameInProgress) 
+		{
+			if (!analyzeMode) startSearchOver();
+			else stopThought(); 
+		}
 
-   else if (!strcmp(arg[0], "force")) 
-      {
-   	  forceMode = 1; 
-	  
-
-	  if (gameInProgress) 
-	  {
-      if (!analyzeMode) startSearchOver();
-	  else stopThought(); 
-	  }
-
-	  analyzeMode = 0; 
-
-      }
+		analyzeMode = 0; 
+	}
 #ifdef DEBUG_STATS
    else if (!strcmp(arg[0], "debug")) 
       gameBoard.showDebugInfo();
 #endif
 
-   else if (!strcmp(arg[0], "holding")) 
-      {
+	else if (!strcmp(arg[0], "holding")) 
+	{
       if (currentRules != CRAZYHOUSE) 
          {  /* In crazyhouse we should already know
                 what is in each player's hand */
@@ -919,10 +891,9 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
          parseHolding(tmp);
 
 		}
-      }
-  
-   else if (!strcmp(arg[0], "ptell")) 
-      {
+	}
+	else if (!strcmp(arg[0], "ptell")) 
+	{
       partner = 1;                 /* We should have gotten "partner" before,
 									but just to make sure */
       if ((retval = parsePartnerCommand(arg[1], arg[2])) == -1) 
@@ -938,17 +909,17 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
          }
 
       /* If it doesn't fit any thing else see if it's a move */
-      } 
-   else 
-      {
+	} 
+	else 
+	{
        
-	   if (!gameInProgress) 
-         {
-         sprintf(buf, "Illegal move: %s\n", str);
-         output(buf);
-         return;
-         }
-    
+		if (!gameInProgress) 
+		{
+			sprintf(buf, "Illegal move: %s\n", str);
+			output(buf);
+			return;
+		}
+
       m = gameBoard.algebraicMoveToDBMove(arg[0]);
       if (!gameBoard.isLegal(m)) 
          {
@@ -957,18 +928,19 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
          return;
          }
       if ((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor()) 
-            && !forceMode && !analyzeMode)
+            && !forceMode && !analyzeMode) {
 			output("It is not your move");
-
-	  if (gameBoard.playMove(m,0)) 
-         {
-         sprintf(buf, "Tried to play illegal move: %s\n", str);
-         output(buf);
-         } 
-      else 
-         {
-         stopThought(); /* Interrupt the pondering */
-			if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
+		}
+		if (gameBoard.playMove(m,0)) 
+		{
+			sprintf(buf, "Tried to play illegal move: %s\n", str);
+			output(buf);
+		} 
+		else 
+		{
+			stopThought(); /* Interrupt the pondering */
+			if (analyzeMode)
+				gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
 		}
 	}
 }
