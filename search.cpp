@@ -857,14 +857,21 @@ void ponder()
   
 	while(!stopThinking && currentDepth < MAX_SEARCH_DEPTH)
 	{
-		if (currentDepth > 5)   
+		if (currentDepth > 5 && !xboardMode)   
 		{
 			DBMoveToRawAlgebraicMove(m[0],buf2);
 			sprintf(buf, "pondering %s %6d [%2d-%2d]\n", buf2, values[0],
 				currentDepth, currentDepth+(extensions/ONE_PLY));
 			output(buf);
+		} else if (currentDepth > 4){
+			DBMoveToRawAlgebraicMove(m[0],buf);
+			sprintf(buf2, "%3d  %6d  %5d %8d pondering %s\n",
+				currentDepth, values[0],
+				1/*time used, not currently tracked in ponder*/,
+				stats_positionsSearched,
+				buf); 		
+			output(buf2);
 		}
-
 		extensions = 0; 
 
 		for(n = 0; n < count; n++) 
@@ -909,7 +916,7 @@ void ponder()
 	if(currentDepth >= MAX_SEARCH_DEPTH) {
 		/* we've gone as far as we can, wait for it to be our move */
 		while(gameBoard.getColorOnMove() != gameBoard.getDeepBugColor())
-		waitForInput();
+			waitForInput();
 	}
 	return;
 }
