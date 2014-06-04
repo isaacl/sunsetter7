@@ -158,16 +158,17 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 	// don't display any info in bughouse
 	  
 
-	if ((currentRules == CRAZYHOUSE) && (stopThinking))
-	{ 
+	if(currentRules != CRAZYHOUSE){/*shh, bughouse*/}
+	else if (stopThinking)
+	{
 		if (valueReached > MATE)  
-		{ 
+		{
 			if ((valueReached < MATE_IN_ONE-50) && xboardMode)
 			{
 				sprintf(buf, "\ntellics kibitz Mate in %d moves or less ! \n", ((MATE_IN_ONE-valueReached)/10));  
 				output(buf); 
 			}
-		} else { 
+		} else {
 			if (valueReached > 500) 
 			{
 				sprintf (emoticon,":-))");  
@@ -176,7 +177,7 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 			else if (valueReached > 140) sprintf (emoticon,":-)");  
 			else if (valueReached > -140) sprintf (emoticon,":-|");  
 			else if (valueReached > -500) sprintf (emoticon,":-(");  
-			else 
+			else
 			{
 				sprintf (emoticon,":-((");  
 				if (!firstBigValue) { firstBigValue = -gameBoard.getMoveNum(); }
@@ -193,7 +194,7 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 			AIBoard.getEval(buf); output(buf);
 			output("\n");
 		}
-	} else { 
+	} else if(!xboardMode) { 
 		sprintf(buf, "%3d  %6d  %5d %8d ", currentDepth, valueReached, (timeUsed / 10), stats_positionsSearched); 		
 		
 
@@ -206,6 +207,11 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 		
 		if ((analyzeMode) && (timeUsed <200)) output("\r");  
 		else output("\n");  
+	} else { // xboard mode, and not done searching yet
+		if(timeUsed>15){ // skip outputting for the first fraction of a second
+			sprintf(buf, "%3d  %6d  %5d %8d ", currentDepth, valueReached, (timeUsed / 10), stats_positionsSearched); 		
+			output(buf); output(pvtxt); output("\n");
+		}
 	}
 
 	for(n = variationLength-1; n >= 0; n--) {
@@ -231,6 +237,21 @@ void analyzeUpdate()
 {
 	char buf [MAX_STRING], buf2 [MAX_STRING]; 
 
+	if(xboardMode)
+	{
+		if (!searchMoves[0][movesSearched].isBad())
+		{
+			DBMoveToRawAlgebraicMove(searchMoves[0][movesSearched],buf2);
+		// the 100 is in place of "total moves" because we don't have that here
+			sprintf(buf, "stat01: %ld %d %d %d 100 %s \n",
+				(getSysMilliSecs()-startClockTime)/10,
+				stats_positionsSearched,
+				currentDepth,
+				movesSearched, buf2);
+			output (buf); 
+		}
+	}
+	else
 	if (((getSysMilliSecs()-startClockAnalyze) > 4000 ) && ((startClockAnalyze-startClockTime) > 200 ))
 
 	{
@@ -258,52 +279,47 @@ void analyzeUpdate()
  */
 
 void calcTimeToSpend()
-
- {
-
-
-int mytime, opptime;
-
-
-mytime = AIBoard.getTime(AIBoard.getDeepBugColor());
-opptime = AIBoard.getTime(otherColor(AIBoard.getDeepBugColor()));
-
-
-
-if ((FIXED_DEPTH) || (analyzeMode))
-
 {
-	millisecondsPerMove = 100000000; 
-	return; 
-}
+	int mytime, opptime;
 
-if (currentRules == BUGHOUSE) 
 
-{
-	if (opptime < mytime) mytime = opptime; // if opp is low on time, play fast too 
-											// he and my part may have sat 
-											// so maybe my part is low too 
-	millisecondsPerMove = ( initialTime / 360 ) + ( mytime / 360 ); 
-	if (mytime <= 20000) { millisecondsPerMove = mytime / 180; }
-	if (mytime <= 4000) { millisecondsPerMove = 40; }
-	if (mytime <= 800) { millisecondsPerMove = 5; }
-}
+	mytime = AIBoard.getTime(AIBoard.getDeepBugColor());
+	opptime = AIBoard.getTime(otherColor(AIBoard.getDeepBugColor()));
 
-else 
-{											   
-	millisecondsPerMove = ( initialTime / 80 ) + ( mytime / 80 ); 
-	if (mytime <= 20000) { millisecondsPerMove = mytime / 50; }
-	if (mytime <= 4000) { millisecondsPerMove = 100; }
-	if (mytime <= 800) { millisecondsPerMove = 20; }
 
-	if (mytime < opptime) 						// if our opp has more time 
-												// play faster 
+
+	if ((FIXED_DEPTH) || (analyzeMode))
+
 	{
-		millisecondsPerMove = millisecondsPerMove / 2; 
+		millisecondsPerMove = 100000000; 
+		return; 
 	}
-	
-}
 
+	if (currentRules == BUGHOUSE) 
+
+	{
+		if (opptime < mytime) mytime = opptime; // if opp is low on time, play fast too 
+												// he and my part may have sat 
+												// so maybe my part is low too 
+		millisecondsPerMove = ( initialTime / 360 ) + ( mytime / 360 ); 
+		if (mytime <= 20000) { millisecondsPerMove = mytime / 180; }
+		if (mytime <= 4000) { millisecondsPerMove = 40; }
+		if (mytime <= 800) { millisecondsPerMove = 5; }
+	}
+	else 
+	{											   
+		millisecondsPerMove = ( initialTime / 80 ) + ( mytime / 80 ); 
+		if (mytime <= 20000) { millisecondsPerMove = mytime / 50; }
+		if (mytime <= 4000) { millisecondsPerMove = 100; }
+		if (mytime <= 800) { millisecondsPerMove = 20; }
+
+		if (mytime < opptime) 						// if our opp has more time 
+													// play faster 
+		{
+			millisecondsPerMove = millisecondsPerMove / 2; 
+		}
+		
+	}
 }
 
 
@@ -655,24 +671,17 @@ assert (n <= count); // this checks that the hash move we
   
   if(!searchedFirstMove) 
   {
-	  
 	  value = searchFirstMove(searchMoves[0][0], FractionalDeep[currentDepth], *bestValue);
-
-	
 
 #ifdef GAMETREE
 	  DBMoveToRawAlgebraicMove(searchMoves[0][0], buf);
 	  sprintf (buf3,"<b><a href=\"=%s-%d.html\">%s</a></b>  Return Value: %d <br>\n",buf, currentDepth,buf,value); 
 	  fprintf (fi[0], buf3);
 #endif
-	
-    
+
   } 
-  else 
-  {
-	   searchedFirstMove = 0;
-  } 
-	 
+  else searchedFirstMove = 0;
+
   if(stopThinking) break;
 
   *bestValue = values[0] = value;
@@ -812,7 +821,6 @@ if ((*bestValue <= -EXTREME_EVAL) && (! bestMoveLastPly.isBad()) && (!analyzeMod
   }
 
   return;
-
 }
 
 

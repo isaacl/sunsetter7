@@ -230,7 +230,7 @@ int checkInput()
 
    if (gameBoard.timeToMove()) stopThought();
 
-   if (analyzeMode && gameInProgress) analyzeUpdate(); 
+   if (analyzeMode && gameInProgress && !xboardMode) analyzeUpdate(); 
 
 	if (!hThread)
 	{
@@ -336,7 +336,7 @@ int checkInput()
                      
    if(gameBoard.timeToMove()) stopThought();
 
-   if (analyzeMode && gameInProgress) analyzeUpdate(); 
+   if (analyzeMode && gameInProgress && !xboardMode) analyzeUpdate(); 
 
    while (Input(str))
    {
@@ -358,44 +358,44 @@ int checkInput()
  */
 
 void output(const char *str)
-   {
+{
    int outputFD, value;
  
    outputFD = 1;
    
-   do 
-      { 
+   do {
       value = write(outputFD, str, strlen(str));
-      } while(value < 0 && errno == EINTR);
+	} while(value < 0 && errno == EINTR);
 
-   if (value < 0) 
-      {
-      perror("output()");
-      exit(1);
-      }
+	if (value < 0) 
+	{
+		perror("output()");
+		exit(1);
+	}
+	fsync(outputFD);
 
 #ifdef LOG
-   static int startOfLine = 1;
-   if (logFile) 
-      {
-      if (startOfLine) 
-         {
-         fprintf(logFile, "> %s", str);
-         startOfLine = 0;
-         } 
-      else 
-         {
-         fprintf(logFile, "%s", str);
-         }
+	static int startOfLine = 1;
+	if (logFile) 
+	{
+		if (startOfLine) 
+		{
+			fprintf(logFile, "> %s", str);
+			startOfLine = 0;
+		} 
+		else 
+		{
+			fprintf(logFile, "%s", str);
+		}
 
-      if (strchr(str, '\n') != NULL)  
-         startOfLine = 1;
-      fflush(logFile);
-      }
+		if (strchr(str, '\n') != NULL)  
+			startOfLine = 1;
+		fflush(logFile);
+	}
 #endif
 
-   return;
-   }
+	return;
+}
 
 
 
@@ -555,15 +555,12 @@ void parseOption(const char *str)
    (!strcmp(arg[0], "post")) || /* Sending Illegal Move will cause trouble */
    (!strcmp(arg[0], "computer")) ||
    (!strcmp(arg[0], "protover")))
-
-
-   {
+	{
 #ifdef DEBUG_XBOARD
 		output ("//D: command we don't care about, ignoring\n"); 
 #endif
 	return; 
-   }
-   
+	}
 
    /* Process the other options */
 
@@ -892,6 +889,10 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
 
 		}
 	}
+	else if (!strcmp(arg[0], "."))
+	{
+	   if (analyzeMode && gameInProgress) analyzeUpdate(); 
+	}
 	else if (!strcmp(arg[0], "ptell")) 
 	{
       partner = 1;                 /* We should have gotten "partner" before,
@@ -912,7 +913,6 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
 	} 
 	else 
 	{
-       
 		if (!gameInProgress) 
 		{
 			sprintf(buf, "Illegal move: %s\n", str);
@@ -920,18 +920,18 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
 			return;
 		}
 
-      m = gameBoard.algebraicMoveToDBMove(arg[0]);
-      if (!gameBoard.isLegal(m)) 
-         {
-         sprintf(buf, "Illegal move: %s\n", str);
-         output(buf);
-         return;
-         }
-      if ((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor()) 
-            && !forceMode && !analyzeMode) {
-			output("It is not your move");
+		m = gameBoard.algebraicMoveToDBMove(arg[0]);
+		if (!gameBoard.isLegal(m)) 
+		{
+			sprintf(buf, "Illegal move: %s\n", str);
+			output(buf);
+			return;
 		}
-		if (gameBoard.playMove(m,0)) 
+		if ((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor()) 
+			&& !forceMode && !analyzeMode)
+		{
+			output("It is not your move\n");
+		} else if (gameBoard.playMove(m,0)) 
 		{
 			sprintf(buf, "Tried to play illegal move: %s\n", str);
 			output(buf);
@@ -939,8 +939,13 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
 		else 
 		{
 			stopThought(); /* Interrupt the pondering */
-			if (analyzeMode)
+			if (analyzeMode){
+				extern int stats_positionsSearched;
+				stats_positionsSearched=0;
 				gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
+				gameBoard.setLastMoveNow();
+				startSearchOver();
+			}
 		}
 	}
 }
