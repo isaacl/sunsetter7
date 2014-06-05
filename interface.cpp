@@ -552,9 +552,9 @@ void parseOption(const char *str)
    (!strcmp(arg[0], "name")) ||
    (!strcmp(arg[0], "set")) ||
    (!strcmp(arg[0], "iset")) ||
+   (!strcmp(arg[0], "accepted")) || // response to feature requests, no-op
    (!strcmp(arg[0], "post")) || /* Sending Illegal Move will cause trouble */
-   (!strcmp(arg[0], "computer")) ||
-   (!strcmp(arg[0], "protover")))
+   (!strcmp(arg[0], "computer")))
 	{
 #ifdef DEBUG_XBOARD
 		output ("//D: command we don't care about, ignoring\n"); 
@@ -567,6 +567,13 @@ void parseOption(const char *str)
 	if (!strcmp(arg[0], "xboard")) 
 	{
 		xboardMode = 1; 
+	}
+	else if(!strcmp(arg[0], "protover"))
+	{
+		// Tell xboard which modern features we support.  short list so far.
+		// Remember that "string" features must be quoted even when they do
+		// not have any spaces in them.
+		output("feature ping=0 draw=0 sigint=0 analyze=1 myname=\"Sunsetter\" variants=\"crazyhouse,bughouse\" done=1\n");
 	}
 	else if (!strcmp(arg[0], "learn")) 
 	{
@@ -586,6 +593,7 @@ void parseOption(const char *str)
 	{
 		analyzeMode = 0;
 		forceMode = 1; 
+		resetAI();
 	} else if (!strcmp(arg[0], "hard")) 
 	{
 		tryToPonder = 1;
