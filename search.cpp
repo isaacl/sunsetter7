@@ -312,13 +312,6 @@ void calcTimeToSpend()
 		if (mytime <= 20000) { millisecondsPerMove = mytime / 50; }
 		if (mytime <= 4000) { millisecondsPerMove = 100; }
 		if (mytime <= 800) { millisecondsPerMove = 20; }
-
-		if (mytime < opptime) 						// if our opp has more time 
-													// play faster 
-		{
-			millisecondsPerMove = millisecondsPerMove / 2; 
-		}
-		
 	}
 }
 
@@ -852,7 +845,6 @@ void ponder()
 	millisecondsPerMove = 100000000;
 	count = AIBoard.moves(m);
 	memset(values, 0, sizeof(values));
-
 
   
 	while(!stopThinking && currentDepth < MAX_SEARCH_DEPTH)
