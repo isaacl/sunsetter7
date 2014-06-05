@@ -845,9 +845,11 @@ void ponder()
 
 	stopThinking = 0;
 	currentDepth = 1;
+	stats_hashFillingUp=stats_positionsSearched=0;
 	millisecondsPerMove = 100000000;
 	count = AIBoard.moves(m);
 	memset(values, 0, sizeof(values));
+	startClockAnalyze = getSysMilliSecs(); 
 
   
 	while(!stopThinking && currentDepth < MAX_SEARCH_DEPTH)
@@ -860,18 +862,17 @@ void ponder()
 			output(buf);
 		} else if (currentDepth > 4){
 			DBMoveToRawAlgebraicMove(m[0],buf);
-			sprintf(buf2, "%3d  %6d  %5d %8d pondering %s\n",
+			sprintf(buf2, "%d %d %ld %d pondering %s(hashfill %%%5.2f)\n",
 				currentDepth, values[0],
-				1/*time used, not currently tracked in ponder*/,
+				(getSysMilliSecs() - startClockAnalyze)/10,
 				stats_positionsSearched,
-				buf); 		
+				buf, stats_hashFillingUp * 50.0 / stats_hashSize);
 			output(buf2);
 		}
 		extensions = 0; 
 
 		for(n = 0; n < count; n++) 
 		{
-
 			if (n && (currentDepth > 3) && (values[n-1] > values[n]+80))
 				extensions -= ONE_PLY;
 		  
