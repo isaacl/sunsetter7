@@ -76,7 +76,7 @@ int stats_MakeUnmake[MOVEGEN_TYPES];
 #endif
 
 /* Time */
-clock_t startClockply, endClockply, startClockAnalyze; 
+clock_t startClockply, startClockAnalyze; 
 clock_t startClockTime, endClockTime; 
 
 
@@ -120,6 +120,8 @@ assert ( pv.depth[ply] <= DEPTH_LIMIT );
  * Input:    The board that the principal variation is from, the depth searched and the value.
  * Output:   None.
  * Purpose:  Used to print out information about the principal variation.
+ * TODO designed to be called once per ply, which actually doesn't happen unless
+ * the first move searched is the best move each ply, so needs some work done
  */
 
 void printPrincipalVar(int valueReached)
@@ -129,10 +131,9 @@ void printPrincipalVar(int valueReached)
 	char buf[MAX_STRING], emoticon[MAX_STRING];
 	char pvtxt[MAX_STRING];
  
-	endClockply =  getSysMilliSecs();
 
-	timeUsed = (endClockply-startClockply); 
-	if (((timeUsed / 10) < 2) && !analyzeMode) return; 
+	timeUsed = (getSysMilliSecs() - startClockTime)/10; // time in centiseconds 
+	if ((timeUsed < 2) && !analyzeMode) return; 
 
 	strcpy (pvtxt,""); 
 
@@ -195,8 +196,8 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 			output("\n");
 		}
 	} else if(!xboardMode) { 
-		sprintf(buf, "%3d  %6d  %5d %8d ", currentDepth, valueReached, (timeUsed / 10), stats_positionsSearched); 		
-		
+		sprintf(buf, "%3d  %6d  %5d %8d ", currentDepth, valueReached,
+			timeUsed, stats_positionsSearched); 		
 
 		for(n = variationLength; n < 9; n++) 
 		{
@@ -205,11 +206,13 @@ assert (!AIBoard.badMove(pv.moves[0][n]));
 		
 		output(buf); output(pvtxt); 
 		
-		if ((analyzeMode) && (timeUsed <200)) output("\r");  
+		if ((analyzeMode) && (timeUsed <20)) output("\r");  
 		else output("\n");  
 	} else { // xboard mode, and not done searching yet
-		if(timeUsed>15){ // skip outputting for the first fraction of a second
-			sprintf(buf, "%3d  %6d  %5d %8d ", currentDepth, valueReached, (timeUsed / 10), stats_positionsSearched); 		
+		if(timeUsed>15){ // only output after first 0.15 seconds
+			sprintf(buf, "%d %d %d %d ",
+				currentDepth, valueReached,
+				timeUsed, stats_positionsSearched); 		
 			output(buf); output(pvtxt); output("\n");
 		}
 	}
