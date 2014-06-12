@@ -134,6 +134,8 @@ void printPrincipalVar(int valueReached)
 
 	timeUsed = (getSysMilliSecs() - startClockTime)/10; // time in centiseconds 
 	if ((timeUsed < 2) && !analyzeMode) return; 
+	if((gameBoard.getColorOnMove() == BLACK))
+		valueReached = -valueReached; // kinda a kludge, but it works
 
 	strcpy (pvtxt,""); 
 
@@ -873,8 +875,14 @@ void ponder()
 
 		for(n = 0; n < count; n++) 
 		{
-			if (n && (currentDepth > 3) && (values[n-1] > values[n]+80))
-				extensions -= ONE_PLY;
+			// moves that are 0.8 pawns worse than the best get searched less
+			// and if they are 1.5 pawns worse, they get even less
+			if (n && (currentDepth > 3)){
+				if(values[0] > values[n]+80)
+					extensions = -ONE_PLY;
+				else if(values[0] > values[n]+150)
+					extensions = -ONE_PLY*2;
+			}
 		  
 			AIBoard.changeBoard(m[n]);
 
