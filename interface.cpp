@@ -573,13 +573,23 @@ void parseOption(const char *str)
 		// Tell xboard which modern features we support.  short list so far.
 		// Remember that "string" features must be quoted even when they do
 		// not have any spaces in them.
-		output("feature ping=0 draw=0 sigint=0 analyze=1 myname=\"Sunsetter\" variants=\"crazyhouse,bughouse\" done=1\n");
+		output("feature ping=0 draw=0 sigint=0 analyze=1 memory=1 myname=\"Sunsetter\" variants=\"crazyhouse,bughouse\" done=1\n");
 	}
 	else if (!strcmp(arg[0], "learn")) 
 	{
 		learning = 1; 
 		readLearnTableFromDisk(); 
 		output("Learning is on.\n");
+	}
+	else if (!strcmp(arg[0], "memory")) 
+	{
+		int totalram=atoi(arg[1]);
+		int hashgoal=totalram - 6; // current estimate, 6meg for non-hash stuff
+		if(hashgoal<16) {
+			output("requested hash size too small, using default\n");
+			hashgoal=16;
+		}
+		makeTranspositionTable(hashgoal*1024*1024); // hashgoal megabytes
 	}
 	else if (!strcmp(arg[0], "analyze")) 
 	{
