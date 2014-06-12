@@ -206,11 +206,11 @@ int makeTranspositionTable(unsigned int size)
      Acording to mine I shouldn't have to do that. */
 
   if(size < MIN_HASH_SIZE) {
-    sprintf(buf, "The transposition table size must be > %d bytes\n",
-	    (int)MIN_HASH_SIZE);
+    sprintf(buf,
+		"The transposition table size %d is too small, must be at least %d bytes\n",
+	    size, (int)MIN_HASH_SIZE);
     output(buf);
-    lookupTable[WHITE] = lookupTable[BLACK] = NULL;
-    return -1;
+    size=MIN_HASH_SIZE;
   }
 
   size /= sizeof(transpositionEntry) * 2;
@@ -244,41 +244,20 @@ int makeTranspositionTable(unsigned int size)
 	 !learnTable[WHITE] || !learnTable[BLACK]) 
   {
     output("Not enough memory to make the transposition tables\n");
-    free(lookupTable[WHITE]);
-    free(lookupTable[BLACK]);
+    if(lookupTable[WHITE]) free(lookupTable[WHITE]);
+    if(lookupTable[BLACK]) free(lookupTable[BLACK]);
     lookupTable[WHITE] = lookupTable[BLACK] = NULL;
-	free(learnTable[WHITE]);
-    free(learnTable[BLACK]);
+	if(learnTable[WHITE]) free(learnTable[WHITE]);
+    if(learnTable[BLACK]) free(learnTable[BLACK]);
     learnTable[WHITE] = learnTable[BLACK] = NULL;
     lookupMask = 0;
 	learnMask = 0; 
     return -1;
   }
 
-  for(n = 0; n < size; n++) 
-  {
-    lookupTable[WHITE][n].hash =  qword(0);
-    lookupTable[BLACK][n].hash =  qword(0);
-
-#ifdef DEBUG_HASH
-	lookupTable[WHITE][n].hashT =  qword(0);
-    lookupTable[BLACK][n].hashT =  qword(0);
-#endif  
-  }
-
-  for(n = 0; n < learnSize; n++) 
-  {
-  	learnTable[WHITE][n].hash =  qword(0);
-    learnTable[BLACK][n].hash =  qword(0);
-	learnTable[WHITE][n].value =  0;
-    learnTable[BLACK][n].value =  0;
-
-
-  }
-  
-
   sprintf(buf, "Created %d byte transposition table and %d byte learn table.\n\n", 
-	  (int)(size * sizeof(transpositionEntry) * 2), (int)(learnSize * sizeof(transpositionEntry) * 2));
+	  (int)(size * sizeof(transpositionEntry) * 2),
+	  (int)(learnSize * sizeof(transpositionEntry) * 2));
   
   output(buf);
   stats_hashSize = size; 
