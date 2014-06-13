@@ -124,7 +124,7 @@ assert ( pv.depth[ply] <= DEPTH_LIMIT );
  * the first move searched is the best move each ply, so needs some work done
  */
 
-void printPrincipalVar(int valueReached)
+static void printPrincipalVar(int valueReached)
 {
 	int n, timeUsed;
 	int variationLength = 0; 
@@ -134,7 +134,7 @@ void printPrincipalVar(int valueReached)
 
 	timeUsed = (getSysMilliSecs() - startClockTime)/10; // time in centiseconds 
 	if ((timeUsed < 2) && !analyzeMode) return; 
-	if((gameBoard.getColorOnMove() == BLACK))
+	if((gameBoard.getColorOnMove() == BLACK) && analyzeMode)
 		valueReached = -valueReached; // kinda a kludge, but it works
 
 	strcpy (pvtxt,""); 
