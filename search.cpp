@@ -828,7 +828,7 @@ if ((*bestValue <= -EXTREME_EVAL) && (! bestMoveLastPly.isBad()) && (!analyzeMod
  * Output:   None.
  * Purpose:  Called when it's the opponents move.  It just searches
  *           until the opponents move.  This doesn't generate a move, but it
- *           puts information in the transpostition tables.
+ *           puts information in the transposition tables.
  *			 Only used in Crazyhouse. 
  */
 
@@ -859,13 +859,13 @@ void ponder()
 		if (currentDepth > 5 && !xboardMode)   
 		{
 			DBMoveToRawAlgebraicMove(m[0],buf2);
-			sprintf(buf, "pondering %s %6d [%2d-%2d]\n", buf2, values[0],
+			sprintf(buf, "pondering %s %6d [%2d-%2d]\n", buf2, -values[0],
 				currentDepth, currentDepth+(extensions/ONE_PLY));
 			output(buf);
 		} else if (currentDepth > 4){
 			DBMoveToRawAlgebraicMove(m[0],buf);
 			sprintf(buf2, "%d %d %ld %d pondering %s(hashfill %%%5.2f)\n",
-				currentDepth, values[0],
+				currentDepth, -values[0],
 				(getSysMilliSecs() - startClockAnalyze)/10,
 				stats_positionsSearched,
 				buf, stats_hashFillingUp * 50.0 / stats_hashSize);
