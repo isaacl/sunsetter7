@@ -398,58 +398,34 @@ void output(const char *str)
  * Purpose:  Used to report the result of a finished game.
  */
 
-void reportResult(result res)
+void reportResult(game_result res)
 {
-
-   switch (res) 
-      {
-      case WHITE_MATE:
- 
-            output("1-0 {White Mates}\n");
-
-		 break;
-
-  
-      case BLACK_MATE:
-       
-            output("0-1 {Black Mates}\n");
-		
-		 break;
-      
-      case WHITE_RESIGNATION:
-      
-            output("0-1 {White Resigns}\n");
-   
-         break;
-    
-      case BLACK_RESIGNATION:
-        
-            output("1-0 {Black Resigns}\n");
-       
-         break;
-    
-      case WHITE_FLAG_FALL:
-
-            output("0-1 {White forfeits on time}\n");
-       
-         break;
-
-      case BLACK_FLAG_FALL:
-      
-            output("1-0 {Black forteits on time}\n");
-      
-         break;
-
-      case BOTH_FLAG_FALL:
-   
-            output("1/2-1/2 {Draw because both players ran out of time}\n");
-
-         break;
-  
-      default:
-         output("The game ended mysteriously\n");
-      }
-
+	switch (res) 
+	{
+		case WHITE_MATE:
+			output("1-0 {White Mates}\n");
+			break;
+		case BLACK_MATE:
+			output("0-1 {Black Mates}\n");
+			break;
+		case WHITE_RESIGNATION:
+			output("0-1 {White Resigns}\n");
+			break;
+		case BLACK_RESIGNATION:
+			output("1-0 {Black Resigns}\n");
+			break;
+		case WHITE_FLAG_FALL:
+			output("0-1 {White forfeits on time}\n");
+			break;
+		case BLACK_FLAG_FALL:
+			output("1-0 {Black forteits on time}\n");
+			break;
+		case BOTH_FLAG_FALL:
+			output("1/2-1/2 {Draw because both players ran out of time}\n");
+			break;
+		default:
+			output("The game ended mysteriously\n");
+	}
 }    
 
 

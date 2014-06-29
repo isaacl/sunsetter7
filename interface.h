@@ -61,7 +61,7 @@ void waitForInput();			/* Don't do anything until some kind
 								of input comes in */
 void giveMove(move m);
 
-void reportResult(result res);
+void reportResult(game_result res);
 
 long getSysMilliSecs();
 

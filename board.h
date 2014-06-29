@@ -95,11 +95,11 @@ typedef int square;
 typedef int color;
 
 
-enum result { WHITE_MATE, BLACK_MATE, WHITE_RESIGNATION, BLACK_RESIGNATION,
+enum game_result { WHITE_MATE, BLACK_MATE, WHITE_RESIGNATION, BLACK_RESIGNATION,
          WHITE_FLAG_FALL, BLACK_FLAG_FALL, BOTH_FLAG_FALL };
 
 
-/* move is Sunsetter's way of reperesenting a move.  
+/* move is Sunsetter's way of representing a move.  
    
    It is a 32 bit value in the following format:
    6 bits -> from square
