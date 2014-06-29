@@ -19,7 +19,7 @@ typedef unsigned int duword;
 typedef signed int sdword;
 
 
-#ifdef _win32_
+#ifdef _WIN32
 
 	typedef unsigned __int64 qword;
 	typedef signed __int64 sqword;
@@ -30,14 +30,9 @@ typedef signed int sdword;
 
 	typedef int socklen_t;
 
-#endif
-
-#ifndef _win32_
-
+#else
 	typedef unsigned long long qword;
 	typedef long long sqword;
-
-	#define __forceinline inline
 
 	#define qword(target) (unsigned long long)(target##ULL)
 #endif

@@ -7,7 +7,7 @@
 # -DNDEBUG turns off assert() debugging in the code
 #
 # uncomment this for a "release" build with no debugging and highly optimized.
-# CFLAGS = -O3 -DNDEBUG
+CFLAGS = -O3 -DNDEBUG
 #
 # uncomment this line to build a full debug version(slow, more likely to crash).
 # need to type "make clean;make" to get the full effect
@@ -15,7 +15,7 @@
 #
 # or this one for a "light debug" version, works with gdb
 # but is otherwise like the release version.
-CFLAGS = -Wall -g -O1 -DNDEBUG
+# CFLAGS = -Wall -g -O1 -DNDEBUG
 #
 
 OBJECTS = aimoves.o bitboard.o board.o book.o bughouse.o evaluate.o moves.o search.o capture_moves.o check_moves.o interface.o notation.o order_moves.o partner.o quiescense.o tests.o transposition.o validate.o

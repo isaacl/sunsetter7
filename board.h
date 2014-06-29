@@ -38,18 +38,6 @@
 #include "definitions.h"
 #include "variables.h"
 
-
-// MSVC warning about inline functions getting deleted,
-// since those are not needed
-
-#ifdef _win32_
-
-	#pragma warning( disable : 4514 ) 
-	#pragma warning( disable : 4711 ) 
-
-#endif
-
-
 #define EXACT 0
 #define FAIL_HIGH 1
 #define FAIL_LOW 2
@@ -134,21 +122,21 @@ struct move {
   duword data;
 
   public:
-  __forceinline 
+  inline 
 	  move(square f, square t, piece mp, piece p) { data = f | (t << 8) |
                     (mp << 16) | (p << 19); };
-  __forceinline move(square f, square t, piece mp) { data = f | (t << 8) | 
+  inline move(square f, square t, piece mp) { data = f | (t << 8) | 
 					(mp << 16); };
-  __forceinline move()                    {data=0; makeBad();};
+  inline move()                    {data=0; makeBad();};
 
-  __forceinline int operator ==(move m)   { return data == m.data; };
-  __forceinline int operator !=(move m)   { return data != m.data; };
-  __forceinline square from()             { return (square) data & 0xFF; };
-  __forceinline square to()               { return (square) (data >> 8) & 0xFF; };
-  __forceinline piece moved()             { return (piece) ((data >> 16) & 7); };
-  __forceinline piece promotion()         { return (piece) ((data >> 19) & 7); };
-  __forceinline int isBad()               { return data >> 23; };
-  __forceinline void makeBad()            { data |= 1 << 23; };
+  inline int operator ==(move m)   { return data == m.data; };
+  inline int operator !=(move m)   { return data != m.data; };
+  inline square from()             { return (square) data & 0xFF; };
+  inline square to()               { return (square) (data >> 8) & 0xFF; };
+  inline piece moved()             { return (piece) ((data >> 16) & 7); };
+  inline piece promotion()         { return (piece) ((data >> 19) & 7); };
+  inline int isBad()               { return data >> 23; };
+  inline void makeBad()            { data |= 1 << 23; };
 
 };
 
@@ -161,44 +149,44 @@ struct bitboard {
   public:
   qword data;
    
-  __forceinline bitboard(qword d) { data = d; };
-  bitboard()        {};
+  inline bitboard(qword d) { data = d; };
+  inline bitboard()        {data = 0; };
 
   int popCount();                  
   // destroys the bitboard and tells how many bits were set 
 
-  __forceinline int moreThanOne() { return (data & (data - 1)) != 0; };
-  __forceinline void setBits(qword d) { data |= d; };
-  __forceinline void setBits(bitboard b) { data |= b.data; };
-  __forceinline void unsetBits(qword d) { data ^= d; }; 
+  inline int moreThanOne() { return (data & (data - 1)) != 0; };
+  inline void setBits(qword d) { data |= d; };
+  inline void setBits(bitboard b) { data |= b.data; };
+  inline void unsetBits(qword d) { data ^= d; }; 
 
   // Note that this only works to unset already set bits 
-  __forceinline void unsetBits(bitboard b) { data ^= b.data; };
+  inline void unsetBits(bitboard b) { data ^= b.data; };
 
   /* Using Pre-generated tables for just about everything makes 
 		it a bit faster , BitInBB has only the to sq corresponding 
 		bit set */ 
 
-  __forceinline void setSquare(square sq) {  data |= (BitInBB[sq]); };
-  __forceinline void unsetSquare(square sq) {  data ^= BitInBB[sq]; }; 
-  __forceinline int bitIsSet(square s) { return (data & s) != 0; };
-  __forceinline int squareIsSet(square s) { return (data & BitInBB[s]) != 0; };
-  __forceinline int hasBits() { return data != 0; };
-  __forceinline bitboard operator =(qword d) { data = d; return *this; };
-  __forceinline bitboard operator =(bitboard b) { data = b.data; return *this; };
-  __forceinline int operator ==(bitboard b) { return data == b.data; };
-  __forceinline int operator !=(bitboard b) { return data != b.data; };  
+  inline void setSquare(square sq) {  data |= (BitInBB[sq]); };
+  inline void unsetSquare(square sq) {  data ^= BitInBB[sq]; }; 
+  inline int bitIsSet(square s) { return (data & s) != 0; };
+  inline int squareIsSet(square s) { return (data & BitInBB[s]) != 0; };
+  inline int hasBits() { return data != 0; };
+  inline bitboard operator =(qword d) { data = d; return *this; };
+  inline bitboard operator =(bitboard b) { data = b.data; return *this; };
+  inline int operator ==(bitboard b) { return data == b.data; };
+  inline int operator !=(bitboard b) { return data != b.data; };  
 
-  __forceinline bitboard operator |(qword b) { return bitboard(data | b); };
-  __forceinline bitboard operator |(bitboard b) { return bitboard(data | b.data); };
-  __forceinline bitboard operator |=(bitboard b) { data |= b.data; return *this; };
+  inline bitboard operator |(qword b) { return bitboard(data | b); };
+  inline bitboard operator |(bitboard b) { return bitboard(data | b.data); };
+  inline bitboard operator |=(bitboard b) { data |= b.data; return *this; };
 
-  __forceinline bitboard operator &(qword b) { return bitboard(data & b); };
-  __forceinline bitboard operator &(bitboard b) { return bitboard(data & b.data); };
-  __forceinline bitboard operator &=(bitboard b) { data &= b.data; return *this; };
-  __forceinline bitboard operator <<(int i) {  return bitboard(data << i); };
-  __forceinline bitboard operator >>(int i) {  return bitboard(data >> i); };  
-  __forceinline duword operator >(int i) { return (i < 32 ? ((duword) data) >> i :
+  inline bitboard operator &(qword b) { return bitboard(data & b); };
+  inline bitboard operator &(bitboard b) { return bitboard(data & b.data); };
+  inline bitboard operator &=(bitboard b) { data &= b.data; return *this; };
+  inline bitboard operator <<(int i) {  return bitboard(data << i); };
+  inline bitboard operator >>(int i) {  return bitboard(data >> i); };  
+  inline duword operator >(int i) { return (i < 32 ? ((duword) data) >> i :
                 ((duword) (data >> 32)) >> (i - 32)); };
 
   /* The '>' operator is split shift right, an idea borrowed from crafty.  It
@@ -207,7 +195,7 @@ struct bitboard {
      doing 64 bit shifts and is much quicker to user then the normal shift
      right.  It should be used when only the bottom 32 bits are needed */
 
-  __forceinline bitboard operator ~(void) { return bitboard(~data); };
+  inline bitboard operator ~(void) { return bitboard(~data); };
 };
 
 /* Function: firstSquare
@@ -216,11 +204,9 @@ struct bitboard {
  * Purpose:  Used to get the lowest square that is set in a bitboard.
  */
 
-#ifdef _win32_
-#pragma warning( disable : 4035 ) // no return value warning 
+#ifdef _WIN32
 
-
-__forceinline int firstSquare (qword a) 
+static inline int firstSquare (qword a) 
    
 {
 	// bitboard must NOT be empty !
@@ -327,7 +313,7 @@ struct takeBackInfo {
 							/* transpositionEntry is what the transposition 
 							tables are built on */
 
-#ifdef _win32_
+#ifdef _WIN32
 #pragma pack(4)				/* I don't know why I need to do this to pack 
 							the table entry in 16 byte */
 #endif
@@ -345,7 +331,7 @@ struct transpositionEntry {
 #endif
 };
 
-#ifdef _win32_
+#ifdef _WIN32
 #pragma pack(8)
 #endif
 
@@ -788,7 +774,7 @@ extern const int knightDirection[8];
 
 /* Some usefull bitboard constants */
 
-#ifdef _win32_
+#ifdef _WIN32
 
 	#define A_FILE      (qword(0x00000000000000FF))
 	#define H_FILE      (qword(0xFF00000000000000))
@@ -797,17 +783,13 @@ extern const int knightDirection[8];
 	#define FOURTH_RANK (qword(0x0808080808080808))
 	#define FIRST_RANK  (qword(0x0101010101010101))
 
-#endif
-
-#ifndef _win32_
-
+#else
 	#define A_FILE      (0x00000000000000FFULL)
 	#define H_FILE      (0xFF00000000000000ULL)
 	#define EIGHTH_RANK (0x8080808080808080ULL)
 	#define FIFTH_RANK  (0x1010101010101010ULL)
 	#define FOURTH_RANK (0x0808080808080808ULL)
 	#define FIRST_RANK  (0x0101010101010101ULL)
-
 #endif
 
 

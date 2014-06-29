@@ -16,23 +16,15 @@
  *************************************************************************** */
 
 
-#ifdef _win32_
-
+#ifdef _WIN32
 	#include <windows.h>
 	#include <io.h>
-	#define _write write
-	#define _read  read
-	#define _close close
-
-#endif
-
-#ifndef _win32_
-	
+#else
+	// unix/posix headers
 	#include <sys/time.h>
 	#include <sys/types.h>
 	#include <unistd.h>
 	#include <sys/select.h>
-
 #endif
 
 
@@ -77,12 +69,12 @@ FILE *logFile;
 
 #endif
 
-#ifdef _win32_
+#ifdef _WIN32
 
 void sleep(int n)
-   {
-   Sleep(n);
-   }
+{
+	Sleep(n);
+}
 
 /*
  *  THREADED NON-BLOCKING CONSOLE INPUT    -- WIN 32 --
@@ -99,7 +91,7 @@ CRITICAL_SECTION critSec;
 HANDLE hThread = NULL;
 
 DWORD WINAPI RunInput(LPVOID pDummy)
-   {
+{
 
    char c;
    int numRead;
@@ -126,11 +118,11 @@ DWORD WINAPI RunInput(LPVOID pDummy)
          }
       }
    return 0;
-   }
+}
 
 
 int Input(char *str)
-   {
+{
 
    if (state <= 0)
       return 0;
@@ -153,7 +145,7 @@ int Input(char *str)
    LeaveCriticalSection(&critSec);
 
    return 1;
-   }
+}
 
 
 // InitInput         // start thread, init globals
@@ -170,7 +162,7 @@ void InitInput()
 
 
 void ShutdownInput()
-   {
+{
 
    DWORD code;
 
@@ -194,7 +186,7 @@ void ShutdownInput()
    CloseHandle(hThread);
 
    DeleteCriticalSection(&critSec);
-   }
+}
 
 /*
  * Function: waitForInput
@@ -216,8 +208,8 @@ void waitForInput()
  * Output:   1 if there was input, 0 if not
  * Purpose:  Used by pollForInput to see if Sunsetter has to handle anything.
  *           It calls select() to see if there is input waiting and if there
- *           is, it calls parseOption().  It also checks if Sunsetter has taken too much time on this move and 
- *           should stop thinking and move.
+ *           is, it calls parseOption().  It also checks if Sunsetter has taken
+ *           too much time on this move and should stop thinking and move.
  */
 
 int checkInput()
@@ -248,7 +240,7 @@ int checkInput()
 
 #endif
 
-#ifndef _win32_
+#ifndef _WIN32
 
 /*
  *								    -- LINUX --
@@ -288,9 +280,10 @@ int Input(char *str)
 			strcpy(str, buf);
 			insert_pt=0;
 #ifdef LOG
-   if (logFile)  
-     fprintf(logFile, "< %s\n", buf);
-	fflush(logFile);
+			if (logFile) {  
+				fprintf(logFile, "< %s\n", buf);
+				fflush(logFile);
+			}
 #endif
 			return 1;
 		}
@@ -396,9 +389,6 @@ void output(const char *str)
 
 	return;
 }
-
-
-
 
 
 /* 
@@ -852,7 +842,7 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
 	{
 	  if (learning) saveLearnTableToDisk(); 
 
-#ifdef _win32_      
+#ifdef _WIN32
 	  ShutdownInput();
 #endif
 	  

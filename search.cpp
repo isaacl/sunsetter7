@@ -101,7 +101,8 @@ int tryToPonder;						/* If we should be pondering */
  */
 
 
-__forceinline void savePrincipalVar(move m, int ply) 
+static inline void
+savePrincipalVar(move m, int ply) 
 {
 	
 assert ( pv.depth[ply] <= DEPTH_LIMIT );

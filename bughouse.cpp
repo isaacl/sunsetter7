@@ -53,11 +53,11 @@
 #include "brain.h"
 
 
-#ifdef _win32_
+#ifdef _WIN32
 void sleep (int);
 #endif
 
-#ifndef _win32_
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 
@@ -292,13 +292,11 @@ main(int argc, char **argv)
 		}
 
 		// sleep for 1/100th of a second, avoid hogging the cpu
-#ifdef _win32_
+#ifdef _WIN32
 		sleep(10);
-#endif
-#ifndef _win32_
+#else
 		usleep(10000);
 #endif
-
 		checkInput();
   }
 }
