@@ -54,10 +54,8 @@
 
 
 #ifdef _WIN32
-void sleep (int);
-#endif
-
-#ifndef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
 #endif
 
@@ -293,7 +291,7 @@ main(int argc, char **argv)
 
 		// sleep for 1/100th of a second, avoid hogging the cpu
 #ifdef _WIN32
-		sleep(10);
+		Sleep(10);
 #else
 		usleep(10000);
 #endif

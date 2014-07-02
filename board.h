@@ -204,8 +204,10 @@ struct bitboard {
  * Purpose:  Used to get the lowest square that is set in a bitboard.
  */
 
+/*
 #ifdef _WIN32
-
+// this version might work in some Windows compiler, but the one that is
+// not commented out below works for MinGW compiler and for gcc.
 static inline int firstSquare (qword a) 
    
 {
@@ -219,9 +221,8 @@ static inline int firstSquare (qword a)
 }
 
 
-#pragma warning( default : 4035 )
-
-#elif defined(__i386__)
+*/
+#if defined(__i386__)
 
 static inline
 int firstSquare (qword a)
