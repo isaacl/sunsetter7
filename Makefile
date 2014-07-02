@@ -17,12 +17,14 @@ CFLAGS = -O3 -DNDEBUG
 # but is otherwise like the release version.
 # CFLAGS = -Wall -g -O1 -DNDEBUG
 #
+# uncomment following line if compiling with mingw under Windows
+# LINKFLAGS = -static
 
 OBJECTS = aimoves.o bitboard.o board.o book.o bughouse.o evaluate.o moves.o search.o capture_moves.o check_moves.o interface.o notation.o order_moves.o partner.o quiescense.o tests.o transposition.o validate.o
 
 # sunsetter is the default target, so either "make" or "make sunsetter" will do
 sunsetter: $(OBJECTS) Makefile
-	g++ $(CFLAGS) $(OBJECTS) -o sunsetter
+	g++ $(CFLAGS) $(LINKFLAGS) $(OBJECTS) -o sunsetter
 
 # so "make clean" will wipe out the files created by a make.
 clean:
