@@ -1,17 +1,17 @@
 /* ***************************************************************************
  *                                Sunsetter                                  *
- *				 (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
- *																			 *
+ *               (c) Ben Dean-Kawamura, Georg v. Zimmermann                  *
+ *                                                                           *
  *  Credit for the Linux input code goes to Angrim (thanks !). I wish        *
- *  I undertood how it works.												 *
- *																			 *																			 *
+ *  I understood how it works.                                               *
+ *                                                                           *
  *   For license terms, see the file COPYING that came with this program.    *
  *                                                                           *
  *  Name: interface.cc                                                       *
  *  Purpose: Has the functions relating to the user interface.               *
  *                                                                           *
- *  Comments: interface.h contatains functions for communication.  See       *
- * DESIGN for a description of the what happens.                             *
+ *  Comments: interface.h contains functions for communication.  See         *
+ *     DESIGN for a description of what happens.                             *
  *                                                                           *
  *************************************************************************** */
 
@@ -70,11 +70,6 @@ FILE *logFile;
 #endif
 
 #ifdef _WIN32
-
-void sleep(int n)
-{
-	Sleep(n);
-}
 
 /*
  *  THREADED NON-BLOCKING CONSOLE INPUT    -- WIN 32 --
@@ -340,7 +335,7 @@ int checkInput()
    return wasInput;
 }
 
-#endif
+#endif // not _WIN32
 
 
 /* 
@@ -365,7 +360,6 @@ void output(const char *str)
 		perror("output()");
 		exit(1);
 	}
-	fsync(outputFD);
 
 #ifdef LOG
 	static int startOfLine = 1;
