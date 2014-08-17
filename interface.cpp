@@ -745,6 +745,7 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
    else if(!strcmp(arg[0], "sd"))
 	{
 		FIXED_DEPTH = atoi(arg[1]);
+		printf("set fixed depth to %d\n", FIXED_DEPTH);
 	}
    else if(!strcmp(arg[0], "nullreduct"))
 	{

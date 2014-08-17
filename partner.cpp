@@ -42,7 +42,7 @@ void givePartnerHelp(const char *str)
   } else if(!strcasecmp(str, "sit") || !strcasecmp(str, "go")) {
     output("tellics ptell sit means to sit, go means to stop sitting. \n");
   } else if(!strcasecmp(str, "flag")) {
-    output("tellics ptell Use flag to tell me to flag my opponent (I usally have autoflag on, but sometimes I forget).\n");
+    output("tellics ptell Use flag to tell me to flag my opponent (I usually have autoflag on, but sometimes I forget).\n");
   } else if(!strcasecmp(str, "abort")) {
     output("tellics ptell Use abort to make me offer or accept an abort request\n");
   } else if(str[0] == '\0') {
@@ -57,8 +57,8 @@ void givePartnerHelp(const char *str)
 /* Function: parsePartnerCommand
  * Input:    *arg1 , *arg2
  * Output:    0 if successfull and we should give back some acknowledgement,
- *            1 if sucsessfull and we don't need to say anything,
- *           -1 if not sucsessfull
+ *            1 if successfull and we don't need to say anything,
+ *           -1 if not successfull
  * Purpose:  Used to interpret a ptell from Sunsetter's partner.  It gets the
  *           second word of the message.
  */
