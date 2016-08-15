@@ -259,6 +259,13 @@ assert(a!=0); // bsf doesn't work on 0, which has no bits set.
 		: "cc");
 	return (int)res;
 }
+#elif defined(__GNUC__)
+static inline
+int firstSquare (qword a)
+{
+    assert(a != 0);
+    return __builtin_ctzll(a);
+}
 #else
 #error not a supported architecture
 	// If someone wants to support non-intel architectures, there are some (slower) C versions
