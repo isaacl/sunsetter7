@@ -62,12 +62,11 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <queue>
-#include <string>
 
-static std::queue<std::string> command_queue;
+static std::queue<char *> command_queue;
 
 extern "C" void queue_command(const char *c_cmd) {
-    command_queue.push(std::string(c_cmd));
+    command_queue.push(strdup(c_cmd));
 }
 #endif  // #ifdef __EMSCRIPTEN__
 
@@ -325,8 +324,10 @@ mainLoop(void *) {
 		checkInput();
 #else
     while (!command_queue.empty()) {
-        parseOption(command_queue.front().c_str());
+        char *c_cmd = command_queue.front();
         command_queue.pop();
+        parseOption(c_cmd);
+        free(c_cmd);
     }
 
     emscripten_async_call(mainLoop, NULL, 100);
