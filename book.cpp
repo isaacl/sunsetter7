@@ -15,6 +15,7 @@
 #include "definitions.h"
 #include "board.h"
 
+#ifndef __EMSCRIPTEN__
 extern FILE *findFile(const char *name, const char *mode);
 
 // dynamicly allocated array of pointers to arrays of characters
@@ -40,11 +41,13 @@ static int
 qstrcmp(const void *a,const void *b){
 	return strcmp((const char *)a,(const char *)b);
 }
+#endif  // #ifndef __EMSCRIPTEN__
 
 // load book file into ram, parsing it and sorting it.
 static void
 initBook(void)
 {
+#ifndef __EMSCRIPTEN__
 	FILE *bookfile;
 	char buff[MAX_STRING];
 	char len;
@@ -82,11 +85,13 @@ initBook(void)
 
 	// close the book file
 	fclose(bookfile);
+#endif  // #ifndef __EMSCRIPTEN__
 }
 
 int
 bookMove(move *rightMove, boardStruct &where)
 {
+#ifndef __EMSCRIPTEN__
 	static bool init_called = false;
 	// rem s points to static memory, don't free
 	const char *s=where.getLineText();
@@ -106,6 +111,7 @@ bookMove(move *rightMove, boardStruct &where)
 		if(rightMove->isBad()) return 0;
 		return 1;
 	}
+#endif  // #ifndef __EMSCRIPTEN__
 	return 0;
 }
 

@@ -175,6 +175,7 @@ pValue[PAWN] = 100; pValue[ROOK] = 200; pValue[KNIGHT] = 192; pValue[BISHOP] = 1
  *           directory and the home directory
  */
 
+#ifndef __EMSCRIPTEN__
 FILE *findFile(const char *name, const char *mode)
 {
   char str[MAX_STRING], *ptr;
@@ -198,6 +199,7 @@ FILE *findFile(const char *name, const char *mode)
   }
   return f;
 }
+#endif  // #ifndef __EMSCRIPTEN__
 
 /* Function: findZHGame
  * Input:    None
@@ -338,9 +340,9 @@ mainLoop(void *) {
  *			 command line parameters are supported. 
  */
 
-
 void ReadIniFile(char *filename) 
 {
+#ifndef __EMSCRIPTEN__
 	char parambuf[MAX_STRING]=""; 
 	FILE *inif;	
 
@@ -352,6 +354,7 @@ void ReadIniFile(char *filename)
 		}
 		fclose(inif); inif=NULL;
 	}
+#endif  // __EMSCRIPTEN__
 }
 
 
