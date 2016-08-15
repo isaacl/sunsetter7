@@ -1,5 +1,7 @@
 # Makefile to build sunsetter for linux.
-#
+
+CXX = clang++
+
 # -Wall turns on full compiler warnings, only of interest to developers
 # -O1 turns on optimization at a moderate level.
 # -O3 turns on optimization at the highest level. (confuses the debugger though)
@@ -24,7 +26,7 @@ OBJECTS = aimoves.o bitboard.o board.o book.o bughouse.o evaluate.o moves.o sear
 
 # sunsetter is the default target, so either "make" or "make sunsetter" will do
 sunsetter: $(OBJECTS) Makefile
-	g++ $(CFLAGS) $(LINKFLAGS) $(OBJECTS) -o sunsetter
+	$(CXX) $(CFLAGS) $(LINKFLAGS) $(OBJECTS) -o sunsetter
 
 # so "make clean" will wipe out the files created by a make.
 clean:
@@ -32,58 +34,56 @@ clean:
 
 
 aimoves.o: aimoves.cpp definitions.h variables.h board.h brain.h interface.h
-	g++ $(CFLAGS) -c aimoves.cpp -o $@
+	$(CXX) $(CFLAGS) -c aimoves.cpp -o $@
 
 bitboard.o: bitboard.cpp board.h bughouse.h interface.h brain.h
-	g++ $(CFLAGS) -c bitboard.cpp -o $@
+	$(CXX) $(CFLAGS) -c bitboard.cpp -o $@
 
 board.o: board.cpp board.h brain.h interface.h definitions.h bughouse.h \
 	variables.h notation.h
-	g++ $(CFLAGS) -c board.cpp -o $@
+	$(CXX) $(CFLAGS) -c board.cpp -o $@
 
 book.o: book.cpp variables.h definitions.h board.h
-	g++ $(CFLAGS) -c book.cpp -o $@
+	$(CXX) $(CFLAGS) -c book.cpp -o $@
 
 bughouse.o: bughouse.cpp variables.h definitions.h board.h interface.h bughouse.h brain.h
-	g++ $(CFLAGS) -c bughouse.cpp -o $@
+	$(CXX) $(CFLAGS) -c bughouse.cpp -o $@
 
 capture_moves.o: capture_moves.cpp board.h brain.h
-	g++ $(CFLAGS) -c capture_moves.cpp -o $@
+	$(CXX) $(CFLAGS) -c capture_moves.cpp -o $@
 
 check_moves.o: check_moves.cpp board.h
-	g++ $(CFLAGS) -c check_moves.cpp -o $@
+	$(CXX) $(CFLAGS) -c check_moves.cpp -o $@
 
 evaluate.o: evaluate.cpp brain.h board.h evaluate.h
-	g++ $(CFLAGS) -c evaluate.cpp -o $@
+	$(CXX) $(CFLAGS) -c evaluate.cpp -o $@
 
 interface.o: interface.cpp interface.h variables.h notation.h bughouse.h brain.h board.h
-	g++ $(CFLAGS) -c interface.cpp -o $@
+	$(CXX) $(CFLAGS) -c interface.cpp -o $@
 
 moves.o: moves.cpp interface.h variables.h board.h
-	g++ $(CFLAGS) -c moves.cpp -o $@
+	$(CXX) $(CFLAGS) -c moves.cpp -o $@
 
 notation.o: notation.cpp bughouse.h notation.h interface.h board.h brain.h variables.h
-	g++ $(CFLAGS) -c notation.cpp -o $@
+	$(CXX) $(CFLAGS) -c notation.cpp -o $@
 
 order_moves.o: order_moves.cpp board.h brain.h interface.h notation.h
-	g++ $(CFLAGS) -c order_moves.cpp -o $@
+	$(CXX) $(CFLAGS) -c order_moves.cpp -o $@
 
 partner.o: partner.cpp board.h brain.h interface.h notation.h
-	g++ $(CFLAGS) -c partner.cpp -o $@
+	$(CXX) $(CFLAGS) -c partner.cpp -o $@
 
 quiescense.o: quiescense.cpp board.h brain.h interface.h variables.h notation.h
-	g++ $(CFLAGS) -c quiescense.cpp -o $@
+	$(CXX) $(CFLAGS) -c quiescense.cpp -o $@
 
 search.o: search.cpp board.h brain.h bughouse.h notation.h interface.h
-	g++ $(CFLAGS) -c search.cpp -o $@
+	$(CXX) $(CFLAGS) -c search.cpp -o $@
 
 tests.o: tests.cpp board.h brain.h notation.h interface.h
-	g++ $(CFLAGS) -c tests.cpp -o $@
+	$(CXX) $(CFLAGS) -c tests.cpp -o $@
 
 transposition.o: transposition.cpp interface.h definitions.h board.h notation.h brain.h
-	g++ $(CFLAGS) -c transposition.cpp -o $@
+	$(CXX) $(CFLAGS) -c transposition.cpp -o $@
 
 validate.o: validate.cpp interface.h board.h bughouse.h
-	g++ $(CFLAGS) -c validate.cpp -o $@
-
-
+	$(CXX) $(CFLAGS) -c validate.cpp -o $@
