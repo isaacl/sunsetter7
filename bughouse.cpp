@@ -59,6 +59,18 @@
 #include <unistd.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <queue>
+#include <string>
+
+static std::queue<std::string> command_queue;
+
+extern "C" void queue_command(const char *c_cmd) {
+    command_queue.push(std::string(c_cmd));
+}
+#endif  // #ifdef __EMSCRIPTEN__
+
 /* bookMove() should have its own header file, minor todo */
 extern int bookMove(move *rightMove, boardStruct &where);
 
@@ -214,10 +226,11 @@ findZHGame()
  *           then it runs the game loop.
  */
 
+void mainLoop(void *);
+
 int
 main(int argc, char **argv)
 {
-	move m;
 	int n, o;
 	char buf[MAX_STRING];
 
@@ -257,7 +270,18 @@ main(int argc, char **argv)
 		}
 	}
 
-	for (;;) {
+#ifndef __EMSCRIPTEN__
+    for (;;) {
+        mainLoop(NULL);
+    }
+#else
+    mainLoop(NULL);
+#endif  // #ifndef __EMSCRIPTEN__
+}
+
+void
+mainLoop(void *) {
+	move m;
 
 		if(xboardMode && !gameInProgress && !partner && !analyzeMode) {
 			/* nothing going on, trigger the gameend scripts */
@@ -289,6 +313,7 @@ main(int argc, char **argv)
 			} 
 		}
 
+#ifndef __EMSCRIPTEN__
 		// sleep for 1/100th of a second, avoid hogging the cpu
 #ifdef _WIN32
 		Sleep(10);
@@ -296,7 +321,14 @@ main(int argc, char **argv)
 		usleep(10000);
 #endif
 		checkInput();
-  }
+#else
+    while (!command_queue.empty()) {
+        parseOption(command_queue.front().c_str());
+        command_queue.pop();
+    }
+
+    emscripten_async_call(mainLoop, NULL, 100);
+#endif  // #ifndef __EMSCRIPTEN__
 }
 
 /* Function: ReadIniFile

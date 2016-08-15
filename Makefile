@@ -1,6 +1,7 @@
 # Makefile to build sunsetter for linux.
 
-CXX = clang++
+EXE = sunsetter
+CXX = clang
 
 # -Wall turns on full compiler warnings, only of interest to developers
 # -O1 turns on optimization at a moderate level.
@@ -22,11 +23,16 @@ CFLAGS = -O3 -DNDEBUG
 # uncomment following line if compiling with mingw under Windows
 # LINKFLAGS = -static
 
+CXX = em++
+EXE = sunsetter.js
+CFLAGS += -s TOTAL_MEMORY=33550000
+LINKFLAGS += -s TOTAL_MEMORY=33550000 --memory-init-file 0 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_main', '_queue_command']" --pre-js pre.js --post-js post.js
+
 OBJECTS = aimoves.o bitboard.o board.o book.o bughouse.o evaluate.o moves.o search.o capture_moves.o check_moves.o interface.o notation.o order_moves.o partner.o quiescense.o tests.o transposition.o validate.o
 
 # sunsetter is the default target, so either "make" or "make sunsetter" will do
-sunsetter: $(OBJECTS) Makefile
-	$(CXX) $(CFLAGS) $(LINKFLAGS) $(OBJECTS) -o sunsetter
+$(EXE): $(OBJECTS) pre.js post.js
+	$(CXX) $(CFLAGS) $(LINKFLAGS) $(OBJECTS) -o $(EXE)
 
 # so "make clean" will wipe out the files created by a make.
 clean:
