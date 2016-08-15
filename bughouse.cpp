@@ -61,14 +61,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#include <queue>
-
-static std::queue<char *> command_queue;
-
-extern "C" void queue_command(const char *c_cmd) {
-    command_queue.push(strdup(c_cmd));
-}
-#endif  // #ifdef __EMSCRIPTEN__
+#endif
 
 /* bookMove() should have its own header file, minor todo */
 extern int bookMove(move *rightMove, boardStruct &where);
@@ -323,13 +316,7 @@ mainLoop(void *) {
 #endif
 		checkInput();
 #else
-    while (!command_queue.empty()) {
-        char *c_cmd = command_queue.front();
-        command_queue.pop();
-        parseOption(c_cmd);
-        free(c_cmd);
-    }
-
+    checkInput();
     emscripten_async_call(mainLoop, NULL, 100);
 #endif  // #ifndef __EMSCRIPTEN__
 }

@@ -69,6 +69,41 @@ FILE *logFile;
 
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <queue>
+
+static std::queue<char *> command_queue;
+
+extern "C" void queue_command(const char *c_cmd) {
+    command_queue.push(strdup(c_cmd));
+}
+
+void waitForInput() {
+    while (!checkInput()) usleep(1000);
+}
+
+int checkInput() {
+    int wasInput = 0;
+
+    while (!command_queue.empty()) {
+        char *c_cmd = command_queue.front();
+        command_queue.pop();
+        parseOption(c_cmd);
+        free(c_cmd);
+
+        wasInput = 1;
+    }
+
+    return wasInput;
+}
+
+void output(const char *str) {
+    printf("%s", str);
+}
+#else
+
+
 #ifdef _WIN32
 
 /*
@@ -383,6 +418,7 @@ void output(const char *str)
 
 	return;
 }
+#endif  // #ifdef __EMSCRIPTEN__
 
 
 /* 
