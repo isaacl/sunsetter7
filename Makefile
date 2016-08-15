@@ -25,8 +25,8 @@ CFLAGS = -O3 -DNDEBUG
 
 CXX = em++
 EXE = sunsetter.js
-CFLAGS += -s TOTAL_MEMORY=33550000
-LINKFLAGS += -s TOTAL_MEMORY=33550000 --memory-init-file 0 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_main', '_queue_command']" --pre-js pre.js --post-js post.js
+CFLAGS += -s TOTAL_MEMORY=33550000 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
+LINKFLAGS += --memory-init-file 0 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_main', '_queue_command']" --pre-js pre.js --post-js post.js
 
 OBJECTS = aimoves.o bitboard.o board.o book.o bughouse.o evaluate.o moves.o search.o capture_moves.o check_moves.o interface.o notation.o order_moves.o partner.o quiescense.o tests.o transposition.o validate.o
 

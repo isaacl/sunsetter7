@@ -80,11 +80,17 @@ extern "C" void queue_command(const char *c_cmd) {
 }
 
 void waitForInput() {
-    while (!checkInput()) usleep(1000);
+    while (!checkInput()) {
+        emscripten_sleep_with_yield(30);
+    }
 }
 
 int checkInput() {
     int wasInput = 0;
+
+    if (gameBoard.timeToMove()) stopThought();
+
+    if (analyzeMode && gameInProgress && !xboardMode) analyzeUpdate();
 
     while (!command_queue.empty()) {
         char *c_cmd = command_queue.front();
@@ -878,7 +884,6 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
 	else if (!strcmp(arg[0], "force")) 
 	{
 		forceMode = 1; 
-
 		if (gameInProgress) 
 		{
 			if (!analyzeMode) startSearchOver();
@@ -978,11 +983,20 @@ void pollForInput()
 {
 	static int i;
 
+#ifndef __EMSCRIPTEN__
 	if (i++ > 20000)
 	{
 		checkInput();
 		i = 0;
 	}
+#else
+    if (i++ > 20000)
+    {
+        i = 0;
+        checkInput();
+        emscripten_sleep_with_yield(10);
+    }
+#endif  // #ifndef __EMSCRIPTEN__
 }
 
 

@@ -225,6 +225,7 @@ void mainLoop(void *);
 int
 main(int argc, char **argv)
 {
+	move m;
 	int n, o;
 	char buf[MAX_STRING];
 
@@ -264,19 +265,7 @@ main(int argc, char **argv)
 		}
 	}
 
-#ifndef __EMSCRIPTEN__
     for (;;) {
-        mainLoop(NULL);
-    }
-#else
-    mainLoop(NULL);
-#endif  // #ifndef __EMSCRIPTEN__
-}
-
-void
-mainLoop(void *) {
-	move m;
-
 		if(xboardMode && !gameInProgress && !partner && !analyzeMode) {
 			/* nothing going on, trigger the gameend scripts */
 			findZHGame();
@@ -307,18 +296,18 @@ mainLoop(void *) {
 			} 
 		}
 
-#ifndef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep_with_yield(30);
+#else
 		// sleep for 1/100th of a second, avoid hogging the cpu
 #ifdef _WIN32
 		Sleep(10);
 #else
 		usleep(10000);
 #endif
+#endif  // #ifdef __EMSCRIPTEN__
 		checkInput();
-#else
-    checkInput();
-    emscripten_async_call(mainLoop, NULL, 100);
-#endif  // #ifndef __EMSCRIPTEN__
+    }
 }
 
 /* Function: ReadIniFile
