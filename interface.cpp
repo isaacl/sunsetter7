@@ -42,6 +42,7 @@
 
 /* This is what is echoed when the user first logs on to Sunsetter in client mode.  */
 
+#ifndef __EMSCRIPTEN__
 const char *clientLogin = 
 "\n\n"
 "            ^^                   @@@@@@@@@\n"
@@ -55,6 +56,9 @@ const char *clientLogin =
 "\n"
 " Sunsetter " VERSION " \n"
 " (c) Ben Dean-Kawamura, Georg v. Zimmermann\n\n";
+#else
+const char *clientLogin = "Sunsetter " VERSION " (c) Ben Dean-Kawamura, Georg v. Zimmermann\n";
+#endif  // #ifndef __EMSCRIPTEN__
 
 int ratingDiff = 0; 
 int learning = 0;

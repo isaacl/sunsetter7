@@ -27,6 +27,7 @@ ifeq ($(ARCH),js)
 CXX = em++
 EXE = sunsetter.js
 CFLAGS += -s TOTAL_MEMORY=33550000 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
+CFLAGS += -s EMTERPRETIFY_WHITELIST='["__Z10searchMove4moveii", "__Z10searchRootiP4movePi", "__Z12pollForInputv", "__Z12waitForInputv", "__Z13recursiveHashPiS_S_P4moveiiS0_", "__Z15recursiveSearchPiS_S_P4moveiiS0_i", "__Z15searchFirstMove4moveii", "__Z19recursiveFullSearchPiS_S_P4moveiiS0_", "__Z21recursiveCheckEvasionPiS_S_P4moveiiS0_", "__Z6ponderv", "__Z6searchiiiii", "__Z8findMoveP4move", "__Z8testbpgniPPc", "_main"]'
 LINKFLAGS += --memory-init-file 0 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_main', '_queue_command']" --pre-js pre.js --post-js post.js
 endif
 
