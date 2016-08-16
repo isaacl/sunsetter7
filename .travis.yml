@@ -30,6 +30,7 @@ deploy:
   api_key:
     secure: rZWeFNxn7hUivwNktuPltPY/GhBGkA/OgmW/HeUWtnHn4FSyHa/g8duaQbRBlnn+wMTaO49lKtSOYQyc0ELUpqvah4QgR1Qdz4fiCkD+9iS3ydY5/F+6daBZ7O+visAtlEdHMYXvg+0SkKL2dDyra9c/5FV3BpO/x1WMhVHywW1tpyB2cxLZIBl56onug7k/qkZD0FfYm8Ay0PBEAT4Q7OHF135LKDj8qXTYC2SHFml5KI2tOzVuC7+Nv80a97ssOXCiwziB6rU+MUb8PRED1VO8xzxzrg9UUB5h83C8UD9VL/urKOHzVRCiHxEek4ylat+uqSJsqeNBtgW0otPnAIH60kKnp+drlPbjKeBhjIDS+ffi4zXFii1zcr4sSgLEs7+3yDIdOF2rzyeAss1gR352sVtrgfTUmRHKUBUuGwBorVT6xrC3O8bagpiGYOcSi6XCiPQyDaU91qFakCxhBv0o3mCs0vC2IK1xuF7oyfY9OOPfMQgaW0vUmsMO/pYlaLxpJJIErOX2GE7JbWNHciCZ5YObBp37AQktb8UpB1fAvYQaIvWz+/SpNEzEn+hkVQbHsZGneeW1b+onSx8rLRgbb80QmRjBxoortuD0ff4eoFmT7bzx/xzUVWXd9fzMSngC6JudtiEmFz3UnRx1NjmCpPwzwNaNIOqY4TCfzf0=
   prerelease: true
+  skip_cleanup: true
   file_glob: true
   file:
   - $EXE
