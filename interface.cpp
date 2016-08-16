@@ -908,10 +908,9 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
         resetAI();
 
         gameInProgress = 1;
-        soughtGame = 0; 
+        soughtGame = 0;
 
-        gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
-        return;
+        if (analyzeMode) gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
     }
 	else if (!strcmp(arg[0], "holding")) 
 	{

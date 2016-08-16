@@ -447,6 +447,8 @@ struct boardStruct {
  	  
   /* Some primitives to change the board */
 
+  bool custom;
+
   void addPieceToHand(color c, piece p, int hash);
   void removePieceFromHand(color c, piece p, int hash);
 

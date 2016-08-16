@@ -275,7 +275,9 @@ main(int argc, char **argv)
 		{
 			if((gameBoard.getColorOnMove() == gameBoard.getDeepBugColor())) 
 			{
-				if( (gameBoard.getMoveNum()>9) || !bookMove(&m, gameBoard)) findMove(&m);
+				if(gameBoard.custom || gameBoard.getMoveNum()>9 || !bookMove(&m, gameBoard)) {
+                  findMove(&m);
+                }
 				if(!m.isBad() && gameInProgress && !forceMode && !analyzeMode)
 				gameBoard.playMove(m, 1);
 			}

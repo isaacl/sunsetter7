@@ -586,6 +586,7 @@ void boardStruct::resetBoard()
 #endif
 
 
+   custom = false;
    moveNum = 1;
    onMove = WHITE;
    development = 0;
@@ -674,6 +675,7 @@ void boardStruct::setBoard(const char *fen, const char *turn, const char *castle
     stats_overallsearches = stats_overallqsearches = stats_overallticks = 0;
     firstBigValue = 0;
     moveNum = 1;
+    custom = 1;
 
     material = 0;
     development = 0;
@@ -713,7 +715,6 @@ void boardStruct::setBoard(const char *fen, const char *turn, const char *castle
             if (*ch == 'k') kingSquare[BLACK] = sq;
             else if (*ch == 'K') kingSquare[WHITE] = sq;
 
-            printf("%d: %c\n", sq, *ch);
             addPiece(symbolColor(*ch), symbolPiece(*ch), sq, 0, 0);
             sq += 8;
         }
