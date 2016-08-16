@@ -34,7 +34,8 @@
 
 /* undefine this to turn off logging */
 
-#define LOG
+// #define LOG
+#undef LOG
 
 /* the usual "flag" NDEBUG is used for asserts debugging */
 
