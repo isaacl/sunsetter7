@@ -35,5 +35,5 @@ deploy:
   - $EXE
   on:
     tags: true
-    repo: niklasf/Stockfish
+    repo: niklasf/Sunsetter
     branch: master
