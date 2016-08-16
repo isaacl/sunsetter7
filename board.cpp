@@ -707,7 +707,10 @@ void boardStruct::setBoard(const char *fen, const char *turn, const char *castle
             sq += 8 * (*ch - '0');
         } else if (*ch == '/') {
             part++;
-            if (part >= 8) break;
+            if (part >= 8) {
+              ch++;
+              break;
+            }
             sq -= 57 + 8;
         } else if (*ch == '~') {
             promotedPawns.setSquare(sq - 8);
