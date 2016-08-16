@@ -733,8 +733,8 @@ void boardStruct::setBoard(const char *fen, const char *turn, const char *castle
     canCastle[BLACK][KING_SIDE] = canCastle[BLACK][QUEEN_SIDE] = 0;
     canCastle[WHITE][KING_SIDE] = canCastle[WHITE][QUEEN_SIDE] = 0;
 
-    bool wk = isPieceOnSquare(E1, ROOK, WHITE);
-    bool bk = isPieceOnSquare(E8, ROOK, BLACK);
+    bool wk = isPieceOnSquare(E1, KING, WHITE);
+    bool bk = isPieceOnSquare(E8, KING, BLACK);
 
     for (const char *ch = castles; *ch; ch++) {
         if (*ch == 'K' && wk && isPieceOnSquare(H1, ROOK, WHITE)) {
