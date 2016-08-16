@@ -466,9 +466,11 @@ struct boardStruct {
 									position and does the other
 									things needed to start a 
 									game.*/
+  void setBoard(const char *pieces, const char *turn, const char *castles, const char *ep);
 
   void resetBitboards();        /* resets the bitboards for a new
 									game */
+  void updateDiagonalBitboards();
 
   int playMove(move m, int report);
 								/* Plays a move. */
@@ -512,6 +514,7 @@ struct boardStruct {
   color getColorOffMove();
   square getEnPassantSquare();
   piece pieceOnSquare(square sq);
+  bool isPieceOnSquare(square sq, piece p, color c);
 
 #ifdef DEBUG_HASH
   qword getHashValue();

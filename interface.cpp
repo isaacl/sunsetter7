@@ -524,7 +524,6 @@ void parseHolding(const char *str)
          gameBoard.setPieceInHand(c, p, hand[c][p]);
 }
 
-
 /*
  * Function: parseOption
  * Input:    The line that was inputed
@@ -900,7 +899,20 @@ output ("//D: variant parsed, board reset and set to bug or zh \n");
    else if (!strcmp(arg[0], "debug")) 
       gameBoard.showDebugInfo();
 #endif
+    else if (!strcmp(arg[0], "setboard")) {
+        stopThought();
+        currentRules = CRAZYHOUSE;
+        gameBoard.playCrazyhouse();
+        gameBoard.setBoard(arg[1], arg[2], arg[3], arg[4]);
+        zapHashValues();
+        resetAI();
 
+        gameInProgress = 1;
+        soughtGame = 0; 
+
+        gameBoard.setDeepBugColor(gameBoard.getColorOnMove());
+        return;
+    }
 	else if (!strcmp(arg[0], "holding")) 
 	{
       if (currentRules != CRAZYHOUSE) 

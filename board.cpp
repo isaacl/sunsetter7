@@ -649,8 +649,127 @@ assert ((hashMoveCircle >= 0) && (hashMoveCircle <= 7));
    lastMoveTime = getSysMilliSecs(); 
 }
 
-void boardStruct::setLastMoveNow()
+int symbolColor(char symbol) {
+    if ('A' <= symbol && symbol <= 'Z') return WHITE;
+    else return BLACK;
+}
 
+piece symbolPiece(char symbol) {
+    if ('a' <= symbol && symbol <= 'z') symbol = symbol - 'a' + 'A';
+    if (symbol == 'P') return PAWN;
+    else if (symbol == 'N') return KNIGHT;
+    else if (symbol == 'B') return BISHOP;
+    else if (symbol == 'R') return ROOK;
+    else if (symbol == 'Q') return QUEEN;
+    else {
+        assert(symbol == 'K');
+        return KING;
+    }
+}
+
+void boardStruct::setBoard(const char *fen, const char *turn, const char *castles, const char *ep) {
+    // Reset
+    initializeHistory();
+    psittinglong = partsitting = toldpartisit = toldparttosit = parttoldgo = 0;
+    stats_overallsearches = stats_overallqsearches = stats_overallticks = 0;
+    firstBigValue = 0;
+    moveNum = 1;
+
+    material = 0;
+    development = 0;
+
+#ifdef DEBUG_STATS
+    stats_overallDebugA = stats_overallDebugB = 0;
+#endif
+
+    hashMoveCircle++;
+    if (hashMoveCircle == 8) hashMoveCircle = 0;
+
+    promotedPawns = qword(0);
+    occupied[WHITE] = qword(0);
+    occupied[BLACK] = qword(0);
+    pieces[PAWN] = pieces[ROOK] = pieces[KNIGHT] = pieces[BISHOP] = pieces[QUEEN] = pieces[KING] = qword(0);
+    for (int c = WHITE; c <= BLACK; c++) {
+        for (piece p = PAWN; p <= QUEEN; p++) {
+            setPieceInHand(c, p, 0);
+        }
+    }
+    memset(position, NONE, sizeof(position));
+
+    // Pieces
+    square sq = A8;
+    int part = 0;
+    const char *ch;
+    for (ch = fen; *ch; ch++) {
+        if ('0' <= *ch && *ch <= '9') {
+            sq += 8 * (*ch - '0');
+        } else if (*ch == '/') {
+            part++;
+            if (part >= 8) break;
+            sq -= 57 + 8;
+        } else if (*ch == '~') {
+            promotedPawns.setSquare(sq - 8);
+        } else {
+            if (*ch == 'k') kingSquare[BLACK] = sq;
+            else if (*ch == 'K') kingSquare[WHITE] = sq;
+
+            printf("%d: %c\n", sq, *ch);
+            addPiece(symbolColor(*ch), symbolPiece(*ch), sq, 0, 0);
+            sq += 8;
+        }
+    }
+    for (; *ch; ch++) {
+        addPieceToHand(symbolColor(*ch), symbolPiece(*ch), 0);
+    }
+
+    // Update bitboards
+    updateDiagonalBitboards();
+
+    // Turn
+    onMove = (turn[0] == 'b') ? BLACK : WHITE;
+
+    // Castles.
+    canCastle[BLACK][KING_SIDE] = canCastle[BLACK][QUEEN_SIDE] = 0;
+    canCastle[WHITE][KING_SIDE] = canCastle[WHITE][QUEEN_SIDE] = 0;
+
+    bool wk = isPieceOnSquare(E1, ROOK, WHITE);
+    bool bk = isPieceOnSquare(E8, ROOK, BLACK);
+
+    for (const char *ch = castles; *ch; ch++) {
+        if (*ch == 'K' && wk && isPieceOnSquare(H1, ROOK, WHITE)) {
+            canCastle[WHITE][KING_SIDE] = 1;
+        } else if (*ch == 'Q' && wk && isPieceOnSquare(A1, ROOK, WHITE)) {
+            canCastle[WHITE][QUEEN_SIDE] = 1;
+        } else if (*ch == 'k' && bk && isPieceOnSquare(H8, ROOK, BLACK)) {
+            canCastle[BLACK][KING_SIDE] = 1;
+        } else if (*ch == 'q' && bk && isPieceOnSquare(A8, ROOK, BLACK)) {
+            canCastle[BLACK][QUEEN_SIDE] = 1;
+        }
+    }
+
+    // En passant
+    if ('a' <= ep[0] && ep[0] <= 'h' && (ep[1] == '3' || ep[1] == '6')) {
+        int file = ep[0] - 'a';
+        int rank = ep[1] - '0';
+        enPassant = rank * 8 + file;
+    } else enPassant = OFF_BOARD;
+
+    // Meta data
+    timeTaken = 0;
+    playing = !onMove;
+    blackTime = whiteTime = 60000;
+    sitting = forceMode = 0;
+
+    for (int n = 0; n < 64; n++) {
+        attacks[WHITE][n] = sword (((attacksTo(n) | (attacksFrom(KING, n) & pieces[KING])) & occupied[WHITE]).popCount());
+        attacks[BLACK][n] = sword (((attacksTo(n) | (attacksFrom(KING, n) & pieces[KING])) & occupied[BLACK]).popCount());
+    }
+
+    initHash();
+    lastMoveTime = getSysMilliSecs();
+}
+
+void boardStruct::setLastMoveNow()
 {
 	lastMoveTime = getSysMilliSecs(); 
 	return;
@@ -1693,6 +1812,10 @@ square boardStruct::getEnPassantSquare()
 piece boardStruct::pieceOnSquare(square sq)
 {
 	return position[sq];
+}
+
+bool boardStruct::isPieceOnSquare(square sq, piece p, color c) {
+    return position[sq] == p && occupied[c].squareIsSet(sq);
 }
 
 

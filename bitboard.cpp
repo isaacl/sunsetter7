@@ -800,9 +800,6 @@ void boardStruct::removeFromBitboards(color c, piece p, square sq)
 
 void boardStruct::resetBitboards()
    {
-   bitboard bb;
-   square sq;
-
    /* On the starting position the first 16 squares are white, so set the
       first 16 bits on the bitboard, do the same with the last 16 bits for
       black */
@@ -813,16 +810,7 @@ void boardStruct::resetBitboards()
    /* Get the mirrored and diagonal bitboards by getting each bit
       from the occupied bitboards and doing the apropriate transformation */
 
-   occupiedUL = occupiedUR = occupiedMirror = 0;
-   bb = occupied[WHITE] | occupied[BLACK];
-   while(bb.hasBits()) 
-      {
-      sq = firstSquare(bb.data);
-      bb.unsetSquare(sq);   
-      occupiedMirror.setSquare(fileRankSwap(sq));
-      occupiedUR.setSquare(urShift[sq]);
-      occupiedUL.setSquare(ulShift[sq]);
-      }
+    updateDiagonalBitboards();
   
    /* Set up the pieces array */
 
@@ -834,5 +822,18 @@ void boardStruct::resetBitboards()
    pieces[KING]   = qword(0x0000008100000000);
    }
 
-     
+void boardStruct::updateDiagonalBitboards() {
+   bitboard bb;
+   square sq;
 
+   occupiedUL = occupiedUR = occupiedMirror = 0;
+   bb = occupied[WHITE] | occupied[BLACK];
+   while(bb.hasBits()) 
+      {
+      sq = firstSquare(bb.data);
+      bb.unsetSquare(sq);   
+      occupiedMirror.setSquare(fileRankSwap(sq));
+      occupiedUR.setSquare(urShift[sq]);
+      occupiedUL.setSquare(ulShift[sq]);
+      }
+}

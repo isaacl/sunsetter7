@@ -11,6 +11,7 @@ CXX = clang
 #
 # uncomment this for a "release" build with no debugging and highly optimized.
 CFLAGS = -O3 -DNDEBUG
+CFLAGS = -DDEBUG_STATS=1 -DDEBUG_HASH=1
 #
 # uncomment this line to build a full debug version(slow, more likely to crash).
 # need to type "make clean;make" to get the full effect
