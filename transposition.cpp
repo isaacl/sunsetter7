@@ -416,10 +416,13 @@ void zapHashValues()
   unsigned int n;
   int moveNrInit;
 
+  memset(lookupTable[WHITE], 0, stats_hashSize / 2);
+  memset(lookupTable[BLACK], 0, stats_hashSize / 2);
+
   moveNrInit = hashMoveCircle -1; 
   if (moveNrInit == -1) moveNrInit = 7; 
 
-assert ((moveNrInit >= 0) && (moveNrInit <= 7));
+/* assert ((moveNrInit >= 0) && (moveNrInit <= 7));
 
 
   for(n = 0; n <= lookupMask; n++) {
@@ -434,7 +437,7 @@ assert ((moveNrInit >= 0) && (moveNrInit <= 7));
     lookupTable[BLACK][n].hashT = qword(0);
 #endif
 	
-  }
+  } */
 }
 
 
