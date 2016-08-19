@@ -416,8 +416,8 @@ void zapHashValues()
   unsigned int n;
   int moveNrInit;
 
-  memset(lookupTable[WHITE], 0, stats_hashSize / 2);
-  memset(lookupTable[BLACK], 0, stats_hashSize / 2);
+  memset(lookupTable[WHITE], 0, stats_hashSize * sizeof(transpositionEntry));
+  memset(lookupTable[BLACK], 0, stats_hashSize * sizeof(transpositionEntry));
 
   moveNrInit = hashMoveCircle -1; 
   if (moveNrInit == -1) moveNrInit = 7; 
