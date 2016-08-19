@@ -17,7 +17,7 @@ before_install:
 - ldd --version || echo no ldd
 
 script: |
-  if [ "$EXE" != "sunsetter-osx-x86_64"]; then
+  if [ "$EXE" != "sunsetter-osx-x86_64" ]; then
     docker build --tag wheezy-for-sunsetter .
     docker run --volume $PWD:/home/builder/Sunsetter --user $(id -u) wheezy-for-sunsetter
   else
