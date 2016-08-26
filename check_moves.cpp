@@ -51,18 +51,33 @@ int boardStruct::checkEvasionCaptures(move *m)
             {
             sq = firstSquare(thePieces.data);
             thePieces.unsetSquare(sq);
-			
-			
+
 			removeFromBitboards(onMove, position[sq], sq);
 			bb = blockedAttacks(otherColor(onMove),sq); 
 			addToBitboards(onMove, position[sq], sq);
-			
 			if (! bb.squareIsSet(kingSquare[onMove]))
 			{
 				*m++ = move(sq, checkSquare, position[sq]);
 			}
 			
             }
+         if (enPassant != OFF_BOARD && position[checkSquare] == PAWN)
+         {
+            thePieces = attacksTo(enPassant) & pieces[PAWN] & occupied[onMove];
+            while (thePieces.hasBits())
+            {
+               sq = firstSquare(thePieces.data);
+               thePieces.unsetSquare(sq);
+
+				removeFromBitboards(onMove, position[sq], sq);
+				bb = blockedAttacks(otherColor(onMove),sq); 
+				addToBitboards(onMove, position[sq], sq);
+				if (! bb.squareIsSet(kingSquare[onMove]))
+				{
+					*m++ = move(sq, enPassant, position[sq]);
+				}
+            }
+         }
       }
       else 
       {
