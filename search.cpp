@@ -1693,7 +1693,7 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
     
 	 if (currentRules == CRAZYHOUSE) 
 	 {
-		bestValue = -MATE_IN_ONE + ply;
+		bestValue = -MATE_IN_ONE + 10 * ply;
 	 }
 	 else if (AIBoard.cantBlock()) 
 	 {
