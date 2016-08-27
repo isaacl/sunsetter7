@@ -1691,10 +1691,14 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
 	 
 	 // None of the moves were legal.  See if it's checkmate or the person has to sit 
     
-	 if (currentRules == CRAZYHOUSE || AIBoard.cantBlock()) 
+	 if (currentRules == CRAZYHOUSE) 
 	 {
-		bestValue = -MATE_IN_ONE + AIBoard.bughouseMateEval();		
-     } 
+		bestValue += ply;
+	 }
+	 else if (AIBoard.cantBlock()) 
+	 {
+		bestValue = -MATE_IN_ONE + AIBoard.bughouseMateEval();
+	 }
 	 else
 	 {
 		bestValue = -ALMOST_MATE;
@@ -1702,7 +1706,7 @@ assert ( stats_positionsSearched < 1000000000 );  // hoping for the day when
   }
  
 	
-  if (bestValue <= -MATE) bestValue += 10; 
+  if (currentRules == BUGHOUSE && bestValue <= -MATE) bestValue += 10;
   
   // We got mated add to the score to because the mate is one ply deeper than when we assigened it that score 
 
