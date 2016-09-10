@@ -45,7 +45,8 @@ void boardStruct::whitePawnMovesTo(move **m, bitboard possibleTo, piece promote)
    /* Step 2: Generate double push moves to the square by shifting moving the
       pawns forward again and anding off rank other than the 4th */
 
-   to2 = possibleTo & (to << ONE_RANK) &
+   to2 = possibleTo & (((pieces[PAWN] & occupied[WHITE]) << ONE_RANK &
+	   ~(occupied[WHITE] | occupied[BLACK])) << ONE_RANK) &
           FOURTH_RANK & ~(occupied[WHITE] | occupied[BLACK]);
 
    /* Step 3: Put the pawn moves into the array */
@@ -115,7 +116,8 @@ void boardStruct::blackPawnMovesTo(move **m, bitboard possibleTo, piece promote)
    /* Step 2: Generate double push moves to the square by shifting moving the
       pawns forward again and anding off rank other than the 5th */
 
-   to2 = possibleTo & (to >> ONE_RANK) &
+   to2 = possibleTo & (((pieces[PAWN] & occupied[BLACK]) >> ONE_RANK &
+	   ~(occupied[WHITE] | occupied[BLACK])) >> ONE_RANK) &
          FIFTH_RANK & ~(occupied[WHITE] | occupied[BLACK]);
 
 
