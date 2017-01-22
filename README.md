@@ -20,3 +20,4 @@ License
 
 Sunsetter is licensed under the GNU General Public License v2. See COPYING
 for the full license text.
+
